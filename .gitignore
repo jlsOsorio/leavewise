@@ -1,0 +1,25 @@
+# Per-project ignores live in backend/.gitignore and frontend/.gitignore.
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+*.pem
+
+# Claude Code (personal settings; shared config in .claude/ is committed)
+.claude/settings.local.json
+CLAUDE.local.md
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
