@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/leavewise}
+    username: ${DB_USER:leavewise}
+    password: ${DB_PASSWORD:leavewise}
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    username: ${RABBITMQ_USER:leavewise}
+    password: ${RABBITMQ_PASSWORD:leavewise}
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui
+
+logging:
+  level:
+    org.altechego.leavewise: debug

@@ -7,19 +7,19 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.rabbitmq.RabbitMQContainer;
 import org.testcontainers.utility.DockerImageName;
 
+// Same image versions as docker-compose.yml
 @TestConfiguration(proxyBeanMethods = false)
-class TestcontainersConfiguration {
+public class TestcontainersConfiguration {
 
-	@Bean
-	@ServiceConnection
-	PostgreSQLContainer postgresContainer() {
-		return new PostgreSQLContainer(DockerImageName.parse("postgres:latest"));
-	}
+    @Bean
+    @ServiceConnection
+    PostgreSQLContainer postgresContainer() {
+        return new PostgreSQLContainer(DockerImageName.parse("postgres:18"));
+    }
 
-	@Bean
-	@ServiceConnection
-	RabbitMQContainer rabbitContainer() {
-		return new RabbitMQContainer(DockerImageName.parse("rabbitmq:latest"));
-	}
-
+    @Bean
+    @ServiceConnection
+    RabbitMQContainer rabbitContainer() {
+        return new RabbitMQContainer(DockerImageName.parse("rabbitmq:4-management"));
+    }
 }
