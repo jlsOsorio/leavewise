@@ -41,12 +41,13 @@ Names make the code self-explanatory; a reader never needs a comment to know wha
 
 - Magic numbers/strings become `static final` constants or `enum`s named for their meaning; `Duration`/`Period` for time
 - Environment-dependent values (URLs, credentials, limits, timeouts, flags) come from configuration bound to a record
-- Inject a `Clock`; never call `LocalDate.now()` / `Instant.now()` directly
+- Inject a `Clock`; never call `LocalDate.now()` / `Instant.now()` directly. Only exception: the audit timestamps in `AuditableEntity` (entities can't take beans)
 
 ## Test Naming
 
 - `<method_name>_<scenario>_<expected_behavior>`, e.g. `countWorkingDays_rangeIncludesHoliday_shouldExcludeHoliday`
 - One reason to fail per test
+- JUnit 5 runs the tests (`@Test`, `@ParameterizedTest`, `@BeforeEach`, `@Nested`, ...); assertions are AssertJ only (`assertThat`, `assertThatThrownBy`, `SoftAssertions`), never `org.junit.jupiter.api.Assertions`
 
 ## Formatting
 

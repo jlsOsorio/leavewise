@@ -21,6 +21,7 @@
 		<poi.version>5.5.1</poi.version>
 		<anthropic-java.version>2.70.0</anthropic-java.version>
 		<jacoco.version>0.8.15</jacoco.version>
+		<mockito.agent>${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar</mockito.agent>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -176,9 +177,21 @@
 					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
+			<!-- Mockito as an explicit agent: JDK 21+ warns on (and will block) its self-attach. @{argLine} keeps JaCoCo's agent;
+			     ${mockito.agent} uses only plain properties so IntelliJ can resolve it when it imports argLine -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<argLine>@{argLine} -javaagent:${mockito.agent}</argLine>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
+				<configuration>
+					<argLine>@{argLine} -javaagent:${mockito.agent}</argLine>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.jacoco</groupId>

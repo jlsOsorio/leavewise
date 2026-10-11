@@ -5,7 +5,7 @@ Adapt names to the feature. Imports omitted. Contents:
 1. [Media type, WebConfig & PageResponse](#1-media-type-webconfig--pageresponse)
 2. [SecurityConfig with path beans](#2-securityconfig-with-path-beans)
 3. [ErrorCode, exceptions & GlobalExceptionHandler](#3-errorcode-exceptions--globalexceptionhandler)
-4. [BaseEntity](#4-baseentity)
+4. [AuditableEntity](#4-auditableentity)
 5. [Feature slice](#5-feature-slice-vacation)
 6. [Logging aspect](#6-logging-aspect)
 
@@ -194,18 +194,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 }
 ```
 
-## 4. BaseEntity
+## 4. AuditableEntity
 
-Timestamps per `SPEC.md` §5 (UTC `LocalDateTime`, JPA callbacks, no Spring Data auditing). Only for tables that have both columns; others declare `createdAt` themselves.
+Audit timestamps per `SPEC.md` §5 (UTC `LocalDateTime`, JPA callbacks, no Spring Data auditing). Only for tables that have both columns; others declare `createdAt` themselves. `updatedAt` stays `NULL` until the first update.
 
 ```java
 @Getter
 @MappedSuperclass
-public abstract class BaseEntity {
+public abstract class AuditableEntity {
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
 
@@ -226,28 +227,35 @@ public abstract class BaseEntity {
 ```java
 // entity/Vacation.java
 @Entity
+@Table(name = "vacation")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Vacation extends BaseEntity {
+public class Vacation extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private User user;
+    @JoinColumn(name = "user_id", nullable = false)
+    private LwUser user;
 
+    @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
 
+    @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
 
+    @Column(name = "days", nullable = false)
     private int days;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = VacationConstants.STATUS_MAX_LENGTH)
     @Builder.Default
     private VacationStatus status = VacationStatus.PENDING;
 
@@ -274,6 +282,7 @@ public enum VacationStatus { PENDING, ACCEPTED, REJECTED, CANCELLED }
 public class VacationConstants {
 
     public static final String BASE_PATH = "/api/vacations";
+    public static final int STATUS_MAX_LENGTH = 30;
 }
 
 // dto/VacationRequest.java, dto/VacationResponse.java
