@@ -77,8 +77,10 @@ Browser ──(same-origin, httpOnly cookies)──> Next.js (BFF: RSC, Server A
 
 - `Long` ids with `@GeneratedValue(strategy = IDENTITY)`; `@ManyToOne(fetch = LAZY)`.
 - Enums `@Enumerated(STRING)`, values matching the CHECK constraints.
-- `LocalDate` for DATE, `LocalDateTime` (UTC) for TIMESTAMP; `created_at` set via `@PrePersist`, `updated_at` via `@PreUpdate` (no Spring Data auditing; no `created_by`/`updated_by` columns).
+- `LocalDate` for DATE, `LocalDateTime` (UTC) for TIMESTAMP; `created_at` set via `@PrePersist`, `updated_at` via `@PreUpdate` and `NULL` until the first update (no Spring Data auditing or Hibernate `@*Timestamp`; no `created_by`/`updated_by` columns).
 - Lombok on entities: `@Getter @Setter @Builder @NoArgsConstructor(access = PROTECTED) @AllArgsConstructor`, `@Builder.Default` for fields with initial values, `@ToString.Exclude` on lazy associations; no `@Data`/`@EqualsAndHashCode`. `equals` on id (`id != null && id.equals(other.getId())`), `hashCode` = `getClass().hashCode()`.
+- Mappings mirror the schema explicitly: `@Table(name)` on every entity, `@Column(name, nullable, length, unique)` on every field, multi-column unique keys as named `@Table(uniqueConstraints)`, `@JoinColumn(name, nullable)` with `optional = false` on required associations. Column lengths are constants in `<feature>/constants/XConstants`, shared by `@Column(length)` and the request DTOs' `@Size(max)`.
+- Entity class names match the table, except `lw_user` → `LwUser` (avoids clashing with Spring Security's `User`).
 - `spring.jpa.open-in-view=false`, `ddl-auto=validate`. Repositories extend `JpaRepository`.
 - `day_of_week` is ISO: 1 = Monday … 7 = Sunday (`DayOfWeek.getValue()`).
 
@@ -145,7 +147,7 @@ Backend: one `ErrorCode` enum holds these codes and their HTTP status.
 
 |     | Milestone                                                                                         | Read                                                                                                     |
 | --- | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| [ ] | M0 Monorepo scaffold, compose, CI skeleton, Flyway V1, seed                                       | `devops.md`, `security.md` (seeding), `docs/data-model.md`                                               |
+| [x] | M0 Monorepo scaffold, compose, CI skeleton, Flyway V1, seed                                       | `devops.md`, `security.md` (seeding), `docs/data-model.md`                                               |
 | [ ] | M1 Auth (register/login/refresh/logout), security config, BFF cookies + `proxy.ts`                | `security.md`, `api.md` (auth, public, me), `business-rules.md` (BR-1, BR-3), `frontend.md` (auth pages) |
 | [ ] | M2 Admin CRUD: municipalities, companies, locations, work schedule, policies, users, entitlements | `api.md`, `business-rules.md` (BR-8, 13, 14, 15), `frontend.md` (admin)                                  |
 | [ ] | M3 Holidays + generator; `/me/*` endpoints                                                        | `holidays.md`, `api.md` (holidays, me), `business-rules.md` (BR-6)                                       |

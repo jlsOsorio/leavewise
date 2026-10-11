@@ -27,6 +27,8 @@
 2. Ensure the company `SEED_COMPANY_NAME` and its location `SEED_LOCATION_NAME` in that municipality.
 3. Ensure an ADMIN with `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_NAME` in that company and location. Never overwrite an existing user's password.
 
+Seed values are validated at startup (`SeedProperties`): a missing required value, an invalid `ADMIN_EMAIL` or an `ADMIN_PASSWORD` outside the password policy (§Tokens) fails the startup. An existing user with `ADMIN_EMAIL` is never changed (no password reset, no promotion of a USER).
+
 ## Frontend (BFF)
 
 | Cookie  | Content       | Flags                                                                            |

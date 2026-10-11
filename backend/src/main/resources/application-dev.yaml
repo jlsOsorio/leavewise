@@ -18,3 +18,14 @@ springdoc:
 logging:
   level:
     org.altechego.leavewise: debug
+
+# Same values as .env.example
+leavewise:
+  seed:
+    admin-email: ${ADMIN_EMAIL:admin@leavewise.local}
+    admin-password: ${ADMIN_PASSWORD:change-me}
+    admin-name: ${ADMIN_NAME:Administrator}
+    company-name: ${SEED_COMPANY_NAME:LeaveWise}
+    location-name: ${SEED_LOCATION_NAME:Lisboa}
+    municipality: ${SEED_MUNICIPALITY:Lisboa}
+    district: ${SEED_DISTRICT:Lisboa}

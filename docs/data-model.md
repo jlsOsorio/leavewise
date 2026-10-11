@@ -17,16 +17,16 @@ erDiagram
 
     municipality {
         bigint id PK
-        varchar(150) name "NOT NULL"
-        varchar(150) district "NOT NULL"
-        varchar(100) country "NOT NULL"
+        varchar(150) name UK "NOT NULL; UK(name, district, country), case-insensitive"
+        varchar(150) district UK "NOT NULL"
+        varchar(100) country UK "NOT NULL"
     }
 
     company_location {
         bigint id PK
         bigint company_id FK,UK "NOT NULL; UK(company_id, id)"
         bigint municipality_id FK "NOT NULL"
-        varchar(150) name "NOT NULL"
+        varchar(150) name UK "NOT NULL; UK(company_id, name)"
         varchar(500) address "nullable"
     }
 
@@ -189,6 +189,8 @@ erDiagram
 | Table                | Columns                         | Meaning                                           |
 | -------------------- | ------------------------------- | ------------------------------------------------- |
 | company              | name                            | Company names are globally unique                 |
+| municipality         | (lower(name), lower(district), lower(country)) | One municipality per name, district and country, ignoring case (unique index) |
+| company_location     | (company_id, name)              | Location names are unique within a company        |
 | company_location     | (company_id, id)                | Supports the composite FK from lw_user            |
 | lw_user              | email                           | One account per email                             |
 | lw_user              | nif                             | Portuguese tax ID, unique when present (nullable) |
@@ -247,4 +249,4 @@ CREATE INDEX idx_vacation_import_user ON vacation_import(user_id);
 CREATE INDEX idx_holiday_date ON holiday(date);
 ```
 
-Notable DDL: the holiday uniqueness is `UNIQUE NULLS NOT DISTINCT (date, municipality_id)` (PostgreSQL 15+), and `refresh_token.token_hash` is `CHAR(64)` (SHA-256 hex of the opaque token).
+Notable DDL: the municipality uniqueness is a unique expression index on `lower(...)` (case-insensitive), the holiday uniqueness is `UNIQUE NULLS NOT DISTINCT (date, municipality_id)` (PostgreSQL 15+), and `refresh_token.token_hash` is `CHAR(64)` (SHA-256 hex of the opaque token).

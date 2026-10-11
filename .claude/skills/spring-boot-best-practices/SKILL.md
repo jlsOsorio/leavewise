@@ -12,6 +12,9 @@ What to do is owned elsewhere and always applies: JPA/entity conventions, REST f
 ## JPA entities & Lombok (why)
 
 - Why not `@Data`/`@EqualsAndHashCode` on entities: the generated `equals`/`hashCode`/`toString` load lazy associations, loop forever on bidirectional relations (`StackOverflowError`), and change the hash when the id is assigned on persist, so entities get lost in `HashSet`s. Hence id-based `equals` and a class-constant `hashCode` (`SPEC.md` §5)
+- Why not business-key `equals` (email, name, ...): those keys are mutable here (an ADMIN renames a company, a user changes email), some are nullable (`nif`) or span lazy associations (`company_location` = company + name). Two unsaved entities are never "the same row"; to compare candidates before insert (dedupe, find-or-create), compare the key values explicitly or query with `existsBy...`/`findBy...`
+- Why JPA callbacks instead of auditing annotations: Hibernate's `@UpdateTimestamp` and Spring Data's `@LastModifiedDate` both set `updated_at` on insert, but it must stay `NULL` until the first update. Spring Data auditing (`@EnableJpaAuditing` + `AuditingEntityListener`) only adds value with `@CreatedBy`/`@LastModifiedBy`, which the schema doesn't have
+- Why explicit `@Table`/`@Column`/`@JoinColumn`: the entity reads as the schema (names, nullability, length, uniqueness) without opening the migration, and survives renames of Java fields. `ddl-auto=validate` checks only that tables and columns exist with compatible types, not nullability or length; Bean Validation on the request DTO (same `XConstants` lengths) and the DB constraints are what enforce them
 - `@Data` is fine on plain mutable classes that aren't entities
 - Proxied beans can't be `final` because CGLIB must subclass them
 - Keep `lombok-mapstruct-binding` in the annotation processor path so MapStruct sees Lombok's generated accessors and builders

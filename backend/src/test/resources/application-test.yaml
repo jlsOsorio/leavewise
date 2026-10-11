@@ -1,0 +1,11 @@
+# Integration tests (@ActiveProfiles("test")); datasource and RabbitMQ come from Testcontainers (@ServiceConnection)
+leavewise:
+  seed:
+    admin-email: Admin@LeaveWise.test
+    admin-password: test-password
+    admin-name: Test Admin
+    company-name: Test Company
+    location-name: Test Office
+    municipality: Porto
+    district: Porto
+    country: ""

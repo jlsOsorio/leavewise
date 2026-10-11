@@ -14,7 +14,7 @@ org.altechego.leavewise/
   common/
     config/       WebConfig, SecurityConfig, ClockConfig, *Properties records
     exception/    ErrorCode, ApiException, GlobalExceptionHandler
-    entity/       BaseEntity (created_at / updated_at)
+    entity/       AuditableEntity (audit timestamps: created_at / updated_at)
     aop/          cross-cutting aspects
     web/          ApiMediaType, PageResponse
     messaging/    AMQP config and shared messaging types
