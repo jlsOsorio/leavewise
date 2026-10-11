@@ -33,7 +33,9 @@ Backend (`cd backend`; Docker must be running for Testcontainers):
 Frontend (`cd frontend`):
 
 ```bash
-npm run lint && npm run typecheck && npm test   # full check (CI also runs npm run build)
+npm run lint && npm run typecheck && npm run format:check && npm test   # full check (CI also runs npm run build)
+npm run eslint:fix                              # ESLint auto-fix (import order, type imports, ...); append -- <file> for one file
+npm run format                                  # Prettier (the Claude edit hook runs eslint:fix + Prettier on each edited file)
 npx vitest run src/lib/schemas/nif.test.ts      # single test file (-t "name" to filter)
 npx playwright test e2e/<file>.spec.ts          # E2E; requires the compose stack up
 npm run dev

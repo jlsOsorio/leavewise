@@ -23,7 +23,7 @@
 
 `SeedRunner` (`ApplicationRunner`, idempotent) runs after Flyway:
 
-1. Ensure the municipality from `SEED_MUNICIPALITY` (format `name/district/country`, default `Lisboa/Lisboa/Portugal`).
+1. Ensure the municipality (concelho) `SEED_MUNICIPALITY` in district `SEED_DISTRICT` and country `SEED_COUNTRY` (optional; blank or unset defaults to `Portugal` in code, not in the schema, so other countries need no migration).
 2. Ensure the company `SEED_COMPANY_NAME` and its location `SEED_LOCATION_NAME` in that municipality.
 3. Ensure an ADMIN with `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_NAME` in that company and location. Never overwrite an existing user's password.
 

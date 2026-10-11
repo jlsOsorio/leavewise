@@ -22,7 +22,7 @@ The browser only talks to Next.js; Next.js is the backend's only client. The bac
 
 | Area     | Tech                                                                                                   |
 | -------- | ------------------------------------------------------------------------------------------------------ |
-| Frontend | Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, shadcn/ui, Zod, Vitest, Playwright     |
+| Frontend | Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, shadcn/ui, Zod, Vitest + MSW, Playwright |
 | Backend  | Java 25, Spring Boot 4 (Web MVC, Security, Data JPA, AMQP), Flyway, MapStruct, Apache POI, Anthropic Java SDK |
 | Infra    | PostgreSQL 18, RabbitMQ 4, Docker Compose, GitHub Actions, GHCR                                        |
 
@@ -70,7 +70,7 @@ On Windows PowerShell use `mvnw.cmd` instead of `./mvnw`.
 cd frontend
 npm install
 npm run dev
-npm run lint && npm run typecheck && npm test
+npm run lint && npm run typecheck && npm run format:check && npm test
 npx playwright test                                      # E2E, requires the compose stack
 ```
 

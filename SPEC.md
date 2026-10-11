@@ -27,7 +27,7 @@ Web app for employees of Portuguese companies to manage vacations.
 
 | Area       | Tech                                                                                                                                                                                                                                                                                              |
 | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Frontend   | Next.js 16 (App Router, Turbopack, `src/`), React 19, TypeScript (strict), TailwindCSS v4, shadcn/ui (Calendar = react-day-picker, Form = react-hook-form + @hookform/resolvers), Lucide React, Zod, Vitest + Testing Library, Playwright                                                         |
+| Frontend   | Next.js 16 (App Router, Turbopack, `src/`), React 19, TypeScript (strict), TailwindCSS v4, shadcn/ui (Calendar = react-day-picker, Form = react-hook-form + @hookform/resolvers), Lucide React, Zod, Vitest + Testing Library + MSW, ESLint + Prettier, Playwright                                                     |
 | Backend    | Java 25, Spring Boot 4 (Spring Framework 7, Spring Security 7, Jackson 3), Maven (wrapper `./mvnw`), Spring Web MVC, Spring Data JPA, Validation, Spring AMQP, OAuth2 Resource Server (Nimbus JWT), Lombok, MapStruct, Flyway, Apache POI (`poi-ooxml`), Anthropic Java SDK (`anthropic-java`, optional AI reason), Actuator, springdoc-openapi 3 (dev only) |
 | Data/infra | PostgreSQL 18, RabbitMQ 4 (management image), Docker, Docker Compose                                                                                                                                                                                                                              |
 | Tests (BE) | JUnit 5, Mockito, AssertJ, Testcontainers (PostgreSQL, RabbitMQ) via `spring-boot-testcontainers` + `@ServiceConnection`                                                                                                                                                                          |
@@ -46,7 +46,7 @@ Web app for employees of Portuguese companies to manage vacations.
 /SPEC.md  /CLAUDE.md  /docs/data-model.md  /.claude/{agents,rules,skills}/**/*.md  /.claude/settings.json  /docs/spec/*.md  /docker-compose.yml  /.env.example
 /.github/workflows/ci.yml
 /backend   pom.xml, Dockerfile, src/main/java/org/altechego/leavewise/..., src/main/resources/db/migration/
-/frontend  package.json, Dockerfile, src/{app,components,lib}/..., e2e/
+/frontend  package.json, Dockerfile, src/{app,components,lib,test}/..., e2e/
 ```
 
 - **Backend packages (by feature):** `org.altechego.leavewise.{auth, user, company, location, municipality, schedule, holiday, policy, entitlement, vacation, suggestion, imports, file, ai, common}`. `common` holds `config/` (incl. `SecurityConfig`, `Clock` bean), `exception/`, `aop/`, `web/`, `messaging/`. Per-feature sub-packages and layering: `.claude/rules/spring-boot.md`.
@@ -117,7 +117,7 @@ Backend: one `ErrorCode` enum holds these codes and their HTTP status.
 - **Backend integration tests:** `*IT` (Failsafe), `@SpringBootTest` + Testcontainers PostgreSQL/RabbitMQ, MockMvc, real Flyway migrations, AI client mocked.
 - Always cover: role and ownership (USER → 404 on another user's resource) and every 4xx code an endpoint can return.
 - Coverage: JaCoCo ≥ 80% lines on `*ServiceImpl`, engines and calculators.
-- **Frontend:** Vitest + Testing Library for schemas, utilities and key components; Playwright E2E against the compose stack (scenarios in `docs/spec/frontend.md`).
+- **Frontend:** Vitest + Testing Library for schemas, utilities and key components, MSW for HTTP mocking (conventions: `.claude/rules/frontend-testing.md`); Playwright E2E against the compose stack (scenarios in `docs/spec/frontend.md`).
 - Feature-specific test lists are in each module file.
 
 ## 7. Glossary

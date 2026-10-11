@@ -5,7 +5,7 @@ paths:
 
 # Next.js Conventions (baseline)
 
-Always applies to frontend code. Version gotchas (async `cookies()`/`params`, `proxy.ts`, who may set cookies) are in `SPEC.md` §2; UI rules in `SPEC.md` §5 Frontend; pages and UX in `docs/spec/frontend.md`. For how/why use the `modern-best-practice-nextjs`, `modern-best-practice-react-components` and `clean-typescript` skills.
+Always applies to frontend code. Version gotchas (async `cookies()`/`params`, `proxy.ts`, who may set cookies) are in `SPEC.md` §2; UI rules in `SPEC.md` §5 Frontend; pages and UX in `docs/spec/frontend.md`. Tests: `frontend-testing.md`. For how/why use the `modern-best-practice-nextjs`, `modern-best-practice-react-components` and `clean-typescript` skills.
 
 ## Talking to the backend
 

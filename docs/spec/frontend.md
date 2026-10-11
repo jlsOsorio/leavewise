@@ -13,6 +13,7 @@ src/app/api/imports/route.ts (upload), api/imports/[id]/events/route.ts (SSE pro
 src/lib/api/{server.ts, errors.ts, media-type.ts}  src/lib/auth/  src/lib/schemas/  src/lib/dates.ts
 src/components/{ui (shadcn), calendar, forms, layout}
 src/proxy.ts
+src/test/{setup.ts, utils.tsx (custom render, when needed), msw/{handlers.ts, server.ts}}
 ```
 
 ## Layout
