@@ -31,7 +31,7 @@ Never commit `.env`. Secrets in CI come from GitHub Actions secrets.
 Runs on push and on PRs to `main`; path filters per job; `concurrency` cancels in-progress runs for the same ref.
 
 1. `backend`: setup-java Temurin 25 with Maven cache → `./mvnw -B verify` (Testcontainers works on `ubuntu-latest`).
-2. `frontend`: Node 24 with npm cache → `npm ci`, `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`.
+2. `frontend`: Node 24 with npm cache → `npm ci`, `npm run lint`, `npm run typecheck`, `npm run format:check`, `npm test`, `npm run build`.
 3. `e2e` (PRs to `main` only): create `.env` from `.env.example` with secrets from GitHub Actions secrets → `docker compose up -d --wait` → Playwright; upload the report as an artifact (7-day retention).
 4. `publish` (push to `main`, after 1 and 2): buildx → `ghcr.io/<owner>/leavewise-{backend,frontend}:{sha,latest}`, pushed with `GITHUB_TOKEN` (`permissions: packages: write`).
 
