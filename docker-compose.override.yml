@@ -1,0 +1,16 @@
+# Local development only: Compose auto-loads this file. CI and prod use docker-compose.yml alone.
+# Publishes the backend and the infrastructure so `./mvnw spring-boot:run -Dspring-boot.run.profiles=dev`
+# and the RabbitMQ management UI (http://localhost:15672) work from the host.
+services:
+  postgres:
+    ports:
+      - "5432:5432"
+
+  rabbitmq:
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  backend:
+    ports:
+      - "8080:8080"
