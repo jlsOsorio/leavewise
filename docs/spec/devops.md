@@ -28,7 +28,7 @@ Never commit `.env`. Secrets in CI come from GitHub Actions secrets.
 
 ## GitHub Actions (`.github/workflows/ci.yml`)
 
-Runs on push and on PRs to `main`; path filters per job; `concurrency` cancels in-progress runs for the same ref.
+Runs on pushes to `main` and on PRs to `main` (feature-branch pushes run through their PR); path filters per job (`dorny/paths-filter`); `concurrency` cancels in-progress runs for the same ref.
 
 1. `backend`: setup-java Temurin 25 with Maven cache → `./mvnw -B verify` (Testcontainers works on `ubuntu-latest`).
 2. `frontend`: Node 24 with npm cache → `npm ci`, `npm run lint`, `npm run typecheck`, `npm run format:check`, `npm test`, `npm run build`.
