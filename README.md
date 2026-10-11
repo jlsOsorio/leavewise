@@ -51,7 +51,7 @@ cp .env.example .env      # fill in secrets (JWT_SECRET, admin credentials, ...)
 docker compose up -d --wait
 ```
 
-Frontend at <http://localhost:3000>, backend at <http://localhost:8080>. An admin account is seeded from the `ADMIN_*` variables in `.env`. All environment variables are listed in [`docs/spec/devops.md`](docs/spec/devops.md).
+Frontend at <http://localhost:3000>, backend at <http://localhost:8080>, RabbitMQ management UI at <http://localhost:15672>. Only the frontend port is published by `docker-compose.yml`; `docker-compose.override.yml` (loaded automatically on your machine) publishes the backend, PostgreSQL (5432) and RabbitMQ (5672, 15672). An admin account is seeded from the `ADMIN_*` variables in `.env`. All environment variables are listed in [`docs/spec/devops.md`](docs/spec/devops.md).
 
 ### Backend
 
@@ -71,8 +71,21 @@ cd frontend
 npm install
 npm run dev
 npm run lint && npm run typecheck && npm run format:check && npm test
+npm run eslint:fix && npm run format                     # auto-fix lint issues and format
 npx playwright test                                      # E2E, requires the compose stack
 ```
+
+### CI
+
+GitHub Actions (`.github/workflows/ci.yml`) runs on pull requests to `main` and on pushes to `main`. The `backend` job runs `./mvnw -B verify`; the `frontend` job runs the full frontend check plus `npm run build`. Each job only runs when its folder (or the workflow) changed. Details in [`docs/spec/devops.md`](docs/spec/devops.md).
+
+Lint the workflow locally before pushing (Docker required, from the repo root):
+
+```bash
+docker run --rm -v "$(pwd):/repo" -w /repo rhysd/actionlint:latest
+```
+
+In Git Bash on Windows, prefix it with `MSYS_NO_PATHCONV=1` and use `$(pwd -W)` instead of `$(pwd)`.
 
 ## Documentation
 

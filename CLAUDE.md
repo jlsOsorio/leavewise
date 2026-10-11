@@ -41,4 +41,6 @@ npx playwright test e2e/<file>.spec.ts          # E2E; requires the compose stac
 npm run dev
 ```
 
+CI workflow lint: `MSYS_NO_PATHCONV=1 docker run --rm -v "$(pwd -W):/repo" -w /repo rhysd/actionlint:latest` (repo root, Git Bash).
+
 Full stack: `docker compose up -d --wait` (frontend :3000, backend :8080, seeded admin from `.env`). Copy `.env.example` to `.env` first.
