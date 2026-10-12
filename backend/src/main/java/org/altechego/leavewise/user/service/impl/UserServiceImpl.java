@@ -4,10 +4,17 @@ import java.util.Locale;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.altechego.leavewise.company.exception.CompanyNotFoundException;
 import org.altechego.leavewise.company.repository.CompanyRepository;
 import org.altechego.leavewise.location.repository.CompanyLocationRepository;
+import org.altechego.leavewise.user.dto.UserRegistrationRequest;
+import org.altechego.leavewise.user.dto.UserResponse;
 import org.altechego.leavewise.user.entity.LwUser;
 import org.altechego.leavewise.user.enums.Role;
+import org.altechego.leavewise.user.exception.EmailTakenException;
+import org.altechego.leavewise.user.exception.LocationCompanyMismatchException;
+import org.altechego.leavewise.user.exception.NifTakenException;
+import org.altechego.leavewise.user.mapper.UserMapper;
 import org.altechego.leavewise.user.repository.LwUserRepository;
 import org.altechego.leavewise.user.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,12 +31,13 @@ public class UserServiceImpl implements UserService {
     private final CompanyRepository companyRepository;
     private final CompanyLocationRepository locationRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
 
     @Override
     @Transactional
     public boolean createAdminIfAbsent(String email, String rawPassword, String name, Long companyId, Long locationId) {
-        var normalizedEmail = email.trim().toLowerCase(Locale.ROOT);
+        var normalizedEmail = normalizeEmail(email);
 
         var existing = lwUserRepository.findByEmail(normalizedEmail);
         if (existing.isPresent()) {
@@ -47,6 +55,48 @@ public class UserServiceImpl implements UserService {
                 .build());
         log.info("Created admin user {}", admin.getId());
         return true;
+    }
+
+    @Override
+    @Transactional
+    public UserResponse register(UserRegistrationRequest request) {
+        var email = normalizeEmail(request.email());
+        var nif = blankToNull(request.nif());
+
+        if (!companyRepository.existsById(request.companyId())) {
+            throw new CompanyNotFoundException(request.companyId());
+        }
+        if (!locationRepository.existsByIdAndCompanyId(request.companyLocationId(), request.companyId())) {
+            throw new LocationCompanyMismatchException();
+        }
+        if (lwUserRepository.existsByEmail(email)) {
+            throw new EmailTakenException();
+        }
+        if (nif != null && lwUserRepository.existsByNif(nif)) {
+            throw new NifTakenException();
+        }
+
+        var user = lwUserRepository.save(LwUser.builder()
+                .name(request.name().trim())
+                .email(email)
+                .passwordHash(passwordEncoder.encode(request.password()))
+                .nif(nif)
+                .contact(blankToNull(request.contact()))
+                .role(Role.USER)
+                .active(true)
+                .company(companyRepository.getReferenceById(request.companyId()))
+                .companyLocation(locationRepository.getReferenceById(request.companyLocationId()))
+                .build());
+        log.info("Registered user {}", user.getId());
+        return userMapper.toResponse(user);
+    }
+
+    private static String normalizeEmail(String email) {
+        return email.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private static String blankToNull(String value) {
+        return value == null || value.isBlank() ? null : value.trim();
     }
 
     private void logExistingUser(LwUser user) {
