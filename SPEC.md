@@ -93,19 +93,22 @@ Browser ──(same-origin, httpOnly cookies)──> Next.js (BFF: RSC, Server A
 
 ### Errors
 
-RFC 9457 `ProblemDetail` from a `@RestControllerAdvice`, with extra properties `code` and, for validation, `errors:[{field,message}]`. The frontend maps `code` to English messages in `lib/api/errors.ts`.
+RFC 9457 `ProblemDetail` from a `@RestControllerAdvice`, with extra properties `code`, `timestamp` (ISO-8601 UTC) and, for validation, `errors:[{field,message}]`. The frontend maps `code` to English messages in `lib/api/errors.ts`.
 
 | HTTP | Codes                                                                                                                                                                      |
 | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 400  | `VALIDATION_ERROR`, `INVALID_FILE`                                                                                                                                         |
+| 400  | `VALIDATION_ERROR`, `INVALID_FILE`, `UNSUPPORTED_API_VERSION`                                                                                                              |
 | 401  | `UNAUTHENTICATED`, `INVALID_CREDENTIALS`, `INVALID_REFRESH_TOKEN`                                                                                                          |
 | 403  | `FORBIDDEN`, `ACCOUNT_DISABLED`                                                                                                                                            |
 | 404  | `NOT_FOUND`                                                                                                                                                                |
+| 405  | `METHOD_NOT_ALLOWED`                                                                                                                                                       |
+| 406  | `NOT_ACCEPTABLE`                                                                                                                                                           |
 | 409  | `EMAIL_TAKEN`, `NIF_TAKEN`, `DUPLICATE`, `RESOURCE_IN_USE`, `LAST_ADMIN`                                                                                                   |
+| 415  | `UNSUPPORTED_MEDIA_TYPE`                                                                                                                                                   |
 | 422  | `MULTI_YEAR_RANGE`, `NO_WORKING_DAYS`, `VACATION_OVERLAP`, `NO_ENTITLEMENT`, `INSUFFICIENT_BALANCE`, `PAST_DATE`, `INVALID_STATUS_TRANSITION`, `LOCATION_COMPANY_MISMATCH` |
 | 500  | `INTERNAL_ERROR`                                                                                                                                                           |
 
-Backend: one `ErrorCode` enum holds these codes and their HTTP status.
+Backend: one `ErrorCode` enum holds these codes and their HTTP status. 405, 406, 415 and `UNSUPPORTED_API_VERSION` come from Spring MVC and signal a BFF bug, not a user error.
 
 ### Frontend
 

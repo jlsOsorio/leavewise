@@ -37,6 +37,11 @@ springdoc:
     enabled: false
 
 leavewise:
+  # Access JWT (HS256) and refresh token lifetimes; see docs/spec/security.md
+  jwt:
+    secret: ${JWT_SECRET}
+    access-ttl: ${JWT_ACCESS_TTL:PT15M}
+    refresh-ttl: ${JWT_REFRESH_TTL:P7D}
   # Startup seed (BR-2); compose passes these from .env
   seed:
     admin-email: ${ADMIN_EMAIL}
