@@ -8,4 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface LwUserRepository extends JpaRepository<LwUser, Long> {
 
     Optional<LwUser> findByEmail(String email);
+
+    boolean existsByEmail(String email);
+
+    boolean existsByNif(String nif);
 }

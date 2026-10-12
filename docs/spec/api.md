@@ -15,6 +15,8 @@
 
 `TokenPair` = `{accessToken, accessTokenExpiresAt, refreshToken, refreshTokenExpiresAt, user:{id,name,email,role,companyId,companyLocationId}}`.
 
+Registration checks, in order: unknown `companyId` → 404 `NOT_FOUND`; location missing or in another company → 422 `LOCATION_COMPANY_MISMATCH` (BR-1); then `EMAIL_TAKEN`, `NIF_TAKEN` (BR-3).
+
 ## Me
 
 | Method      | Path               | Access | Notes                                                                                            |

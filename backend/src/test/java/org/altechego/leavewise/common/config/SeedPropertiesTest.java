@@ -66,7 +66,7 @@ class SeedPropertiesTest {
         assertThat(violations)
                 .extracting(ConstraintViolation::getPropertyPath)
                 .map(Object::toString)
-                .containsExactly("adminPasswordWithinBcryptLimit");
+                .containsExactly("adminPassword");
     }
 
     @Test
