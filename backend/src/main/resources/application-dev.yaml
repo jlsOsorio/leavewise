@@ -19,8 +19,9 @@ logging:
   level:
     org.altechego.leavewise: debug
 
-# Same values as .env.example
 leavewise:
+  jwt:
+    secret: ${JWT_SECRET:ZGV2LW9ubHktand0LXNlY3JldC1kby1ub3QtdXNlLWluLXByb2Q=}
   seed:
     admin-email: ${ADMIN_EMAIL:admin@leavewise.local}
     admin-password: ${ADMIN_PASSWORD:change-me}

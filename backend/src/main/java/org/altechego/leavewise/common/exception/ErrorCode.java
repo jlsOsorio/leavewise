@@ -1,0 +1,49 @@
+package org.altechego.leavewise.common.exception;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+
+@Getter
+@RequiredArgsConstructor
+public enum ErrorCode {
+
+    VALIDATION_ERROR(HttpStatus.BAD_REQUEST),
+    INVALID_FILE(HttpStatus.BAD_REQUEST),
+    UNSUPPORTED_API_VERSION(HttpStatus.BAD_REQUEST),
+
+    UNAUTHENTICATED(HttpStatus.UNAUTHORIZED),
+    INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED),
+    INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED),
+
+    FORBIDDEN(HttpStatus.FORBIDDEN),
+    ACCOUNT_DISABLED(HttpStatus.FORBIDDEN),
+
+    NOT_FOUND(HttpStatus.NOT_FOUND),
+
+    METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED),
+
+    NOT_ACCEPTABLE(HttpStatus.NOT_ACCEPTABLE),
+
+    EMAIL_TAKEN(HttpStatus.CONFLICT),
+    NIF_TAKEN(HttpStatus.CONFLICT),
+    DUPLICATE(HttpStatus.CONFLICT),
+    RESOURCE_IN_USE(HttpStatus.CONFLICT),
+    LAST_ADMIN(HttpStatus.CONFLICT),
+
+    UNSUPPORTED_MEDIA_TYPE(HttpStatus.UNSUPPORTED_MEDIA_TYPE),
+
+    MULTI_YEAR_RANGE(HttpStatus.UNPROCESSABLE_CONTENT),
+    NO_WORKING_DAYS(HttpStatus.UNPROCESSABLE_CONTENT),
+    VACATION_OVERLAP(HttpStatus.UNPROCESSABLE_CONTENT),
+    NO_ENTITLEMENT(HttpStatus.UNPROCESSABLE_CONTENT),
+    INSUFFICIENT_BALANCE(HttpStatus.UNPROCESSABLE_CONTENT),
+    PAST_DATE(HttpStatus.UNPROCESSABLE_CONTENT),
+    INVALID_STATUS_TRANSITION(HttpStatus.UNPROCESSABLE_CONTENT),
+    LOCATION_COMPANY_MISMATCH(HttpStatus.UNPROCESSABLE_CONTENT),
+
+    INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR);
+
+
+    private final HttpStatus status;
+}

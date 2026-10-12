@@ -1,5 +1,7 @@
 # Integration tests (@ActiveProfiles("test")); datasource and RabbitMQ come from Testcontainers (@ServiceConnection)
 leavewise:
+  jwt:
+    secret: dGVzdC1vbmx5LWp3dC1zZWNyZXQtZm9yLWludGVncmF0aW9uLXRlc3Rz
   seed:
     admin-email: Admin@LeaveWise.test
     admin-password: test-password
