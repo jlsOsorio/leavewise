@@ -373,11 +373,11 @@ public class VacationController {
     }
 
     @GetMapping(version = "1", produces = ApiMediaType.JSON)
-    public PageResponse<VacationResponse> findOwn(
+    public ResponseEntity<PageResponse<VacationResponse>> findOwn(
             @AuthenticationPrincipal AuthenticatedUser actor,
             Pageable pageable) {
 
-        return vacationService.findOwn(actor, pageable);
+        return ResponseEntity.ok(vacationService.findOwn(actor, pageable));
     }
 }
 ```

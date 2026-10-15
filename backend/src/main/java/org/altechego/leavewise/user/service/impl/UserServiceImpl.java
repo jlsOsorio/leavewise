@@ -1,12 +1,11 @@
 package org.altechego.leavewise.user.service.impl;
 
-import java.util.Locale;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.altechego.leavewise.company.exception.CompanyNotFoundException;
 import org.altechego.leavewise.company.repository.CompanyRepository;
 import org.altechego.leavewise.location.repository.CompanyLocationRepository;
+import org.altechego.leavewise.user.constants.UserConstants;
 import org.altechego.leavewise.user.dto.UserRegistrationRequest;
 import org.altechego.leavewise.user.dto.UserResponse;
 import org.altechego.leavewise.user.entity.LwUser;
@@ -17,6 +16,9 @@ import org.altechego.leavewise.user.exception.NifTakenException;
 import org.altechego.leavewise.user.mapper.UserMapper;
 import org.altechego.leavewise.user.repository.LwUserRepository;
 import org.altechego.leavewise.user.service.UserService;
+import org.altechego.leavewise.user.util.EmailNormalizer;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +39,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public boolean createAdminIfAbsent(String email, String rawPassword, String name, Long companyId, Long locationId) {
-        var normalizedEmail = normalizeEmail(email);
+        var normalizedEmail = EmailNormalizer.normalize(email);
 
         var existing = lwUserRepository.findByEmail(normalizedEmail);
         if (existing.isPresent()) {
@@ -60,7 +62,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponse register(UserRegistrationRequest request) {
-        var email = normalizeEmail(request.email());
+        var email = EmailNormalizer.normalize(request.email());
         var nif = blankToNull(request.nif());
 
         if (!companyRepository.existsById(request.companyId())) {
@@ -76,7 +78,7 @@ public class UserServiceImpl implements UserService {
             throw new NifTakenException();
         }
 
-        var user = lwUserRepository.save(LwUser.builder()
+        var user = saveNewUser(LwUser.builder()
                 .name(request.name().trim())
                 .email(email)
                 .passwordHash(passwordEncoder.encode(request.password()))
@@ -91,8 +93,24 @@ public class UserServiceImpl implements UserService {
         return userMapper.toResponse(user);
     }
 
-    private static String normalizeEmail(String email) {
-        return email.trim().toLowerCase(Locale.ROOT);
+    // A concurrent registration can pass the exists checks; the unique constraints still reject it
+    private LwUser saveNewUser(LwUser user) {
+        try {
+            return lwUserRepository.saveAndFlush(user);
+        } catch (DataIntegrityViolationException ex) {
+            throw duplicateUserException(ex);
+        }
+    }
+
+    private static RuntimeException duplicateUserException(DataIntegrityViolationException ex) {
+        var constraint = ex.getCause() instanceof ConstraintViolationException violation
+                ? violation.getConstraintName()
+                : null;
+        return switch (constraint) {
+            case UserConstants.EMAIL_UNIQUE_CONSTRAINT -> new EmailTakenException();
+            case UserConstants.NIF_UNIQUE_CONSTRAINT -> new NifTakenException();
+            case null, default -> ex;
+        };
     }
 
     private static String blankToNull(String value) {
