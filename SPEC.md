@@ -88,7 +88,7 @@ Browser ──(same-origin, httpOnly cookies)──> Next.js (BFF: RSC, Server A
 
 - Base path `/api`, versioned by media type: `Accept`/`Content-Type: application/vnd.leavewise+json;version=1`. Responses that aren't JSON (SSE, file download) carry no version and get the default (`1`); multipart uploads send the versioned `Accept`. JSON camelCase, dates `yyyy-MM-dd`, timestamps ISO-8601 UTC. DTOs are records; requests use Bean Validation.
 - Paths are nouns only; actions are sub-resources (`POST /vacations/{id}/approval`).
-- Every collection is paged: `page` (0-based), `size` (default 20, max 100), `sort=field,asc` → `{content, page, size, totalElements, totalPages}`.
+- Every collection is paged: `page` (0-based), `size` (default 20, max 100), `sort=field,asc` → `{content, page, size, totalElements, totalPages}`. `sort` accepts only the fields the endpoint lists in `docs/spec/api.md`; any other field → 400 `VALIDATION_ERROR`.
 - Endpoint catalogue: `docs/spec/api.md`. How each side applies these: backend `.claude/rules/spring-boot.md`, frontend `.claude/rules/nextjs.md`.
 
 ### Errors
