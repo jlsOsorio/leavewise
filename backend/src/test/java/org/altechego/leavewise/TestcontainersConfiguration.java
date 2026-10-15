@@ -7,7 +7,6 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.rabbitmq.RabbitMQContainer;
 import org.testcontainers.utility.DockerImageName;
 
-// Same image versions as docker-compose.yml
 @TestConfiguration(proxyBeanMethods = false)
 public class TestcontainersConfiguration {
 

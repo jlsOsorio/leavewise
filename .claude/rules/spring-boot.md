@@ -60,6 +60,7 @@ org.altechego.leavewise/
 
 - Paths: plural nouns, kebab-case, nested at most one level (`/api/vacations`, `/api/companies/{id}/locations`). **No verbs**: actions are noun sub-resources (`POST /api/vacations/{id}/approval`, `POST /api/holidays/generation`)
 - JSON mappings declare the version and media type: `@GetMapping(version = "1", produces = ApiMediaType.JSON)` (plus `consumes` with a body). Multipart endpoints use `consumes = MULTIPART_FORM_DATA_VALUE` with the JSON `produces`; SSE and file-download endpoints declare their own `produces` and rely on the default version
+- Handler methods return `ResponseEntity<T>` (`ok`, `created(location)`, `status(...)`, `noContent()`), never a bare body or `@ResponseStatus`, so status and headers are visible in one place
 - Every collection endpoint takes `Pageable` (bounds in `SPEC.md` §5) and returns `PageResponse<T>`; never a `List` or Spring's `Page` directly
 
 | Operation                                        | Response                              |

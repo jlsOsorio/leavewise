@@ -1,5 +1,6 @@
 package org.altechego.leavewise.user.service.impl;
 
+import static org.altechego.leavewise.common.exception.ApiExceptionAssertions.assertErrorCode;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -7,9 +8,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.sql.SQLException;
 import java.util.Optional;
 
-import org.altechego.leavewise.common.exception.ApiException;
 import org.altechego.leavewise.common.exception.ErrorCode;
 import org.altechego.leavewise.company.entity.Company;
 import org.altechego.leavewise.company.repository.CompanyRepository;
@@ -20,7 +21,7 @@ import org.altechego.leavewise.user.entity.LwUser;
 import org.altechego.leavewise.user.enums.Role;
 import org.altechego.leavewise.user.mapper.UserMapper;
 import org.altechego.leavewise.user.repository.LwUserRepository;
-import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -28,7 +29,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
@@ -113,7 +117,7 @@ class UserServiceImplTest {
         when(lwUserRepository.existsByEmail("ana@example.pt")).thenReturn(false);
         when(lwUserRepository.existsByNif("123456789")).thenReturn(false);
         when(passwordEncoder.encode("secret-password")).thenReturn("{bcrypt}hash");
-        when(lwUserRepository.save(any(LwUser.class))).thenAnswer(call -> {
+        when(lwUserRepository.saveAndFlush(any(LwUser.class))).thenAnswer(call -> {
             LwUser user = call.getArgument(0);
             user.setId(42L);
             return user;
@@ -122,7 +126,7 @@ class UserServiceImplTest {
         var response = userService.register(request(" Ana@Example.PT ", "123456789"));
 
         var saved = ArgumentCaptor.forClass(LwUser.class);
-        verify(lwUserRepository).save(saved.capture());
+        verify(lwUserRepository).saveAndFlush(saved.capture());
         assertThat(saved.getValue())
                 .extracting(LwUser::getEmail, LwUser::getPasswordHash, LwUser::getRole, LwUser::isActive, LwUser::getNif)
                 .containsExactly("ana@example.pt", "{bcrypt}hash", Role.USER, true, "123456789");
@@ -135,13 +139,13 @@ class UserServiceImplTest {
     void register_blankNifAndContact_shouldStoreNulls() {
         stubValidCompanyAndLocation();
         stubReferences();
-        when(lwUserRepository.save(any(LwUser.class))).thenAnswer(call -> call.getArgument(0));
+        when(lwUserRepository.saveAndFlush(any(LwUser.class))).thenAnswer(call -> call.getArgument(0));
 
         userService.register(new UserRegistrationRequest(
                 "Ana", "ana@example.pt", "secret-password", " ", "", COMPANY_ID, LOCATION_ID));
 
         var saved = ArgumentCaptor.forClass(LwUser.class);
-        verify(lwUserRepository).save(saved.capture());
+        verify(lwUserRepository).saveAndFlush(saved.capture());
         assertThat(saved.getValue()).extracting(LwUser::getNif, LwUser::getContact).containsExactly(null, null);
         verify(lwUserRepository, never()).existsByNif(any());
     }
@@ -177,6 +181,28 @@ class UserServiceImplTest {
         assertErrorCode(() -> userService.register(request("ana@example.pt", "123456789")), ErrorCode.NIF_TAKEN);
     }
 
+    // A concurrent registration passed the exists checks first; the unique constraint rejects this one
+    @ParameterizedTest
+    @CsvSource({"uk_lw_user_email, EMAIL_TAKEN", "uk_lw_user_nif, NIF_TAKEN"})
+    void register_uniqueConstraintViolatedOnSave_shouldThrowMatchingConflict(String constraint, ErrorCode code) {
+        stubValidCompanyAndLocation();
+        stubReferences();
+        when(lwUserRepository.saveAndFlush(any(LwUser.class))).thenThrow(integrityViolation(constraint));
+
+        assertErrorCode(() -> userService.register(request("ana@example.pt", "123456789")), code);
+    }
+
+    // The location was deleted by an admin between the checks and the insert
+    @Test
+    void register_otherIntegrityViolationOnSave_shouldRethrowIt() {
+        stubValidCompanyAndLocation();
+        stubReferences();
+        var violation = integrityViolation("fk_lw_user_company_location");
+        when(lwUserRepository.saveAndFlush(any(LwUser.class))).thenThrow(violation);
+
+        assertThatThrownBy(() -> userService.register(request("ana@example.pt", null))).isSameAs(violation);
+    }
+
 
     private void stubValidCompanyAndLocation() {
         when(companyRepository.existsById(COMPANY_ID)).thenReturn(true);
@@ -192,10 +218,9 @@ class UserServiceImplTest {
         return new UserRegistrationRequest("Ana", email, "secret-password", nif, null, COMPANY_ID, LOCATION_ID);
     }
 
-    private static void assertErrorCode(ThrowingCallable call, ErrorCode code) {
-        assertThatThrownBy(call)
-                .isInstanceOf(ApiException.class)
-                .extracting(ex -> ((ApiException) ex).getErrorCode())
-                .isEqualTo(code);
+    private static DataIntegrityViolationException integrityViolation(String constraint) {
+        var message = "violates constraint " + constraint;
+        var cause = new ConstraintViolationException(message, new SQLException(message), constraint);
+        return new DataIntegrityViolationException(message, cause);
     }
 }

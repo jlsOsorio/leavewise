@@ -29,6 +29,10 @@ Names make the code self-explanatory; a reader never needs a comment to know wha
 - **PREFER** `record` over `@Value`/`@Data` for immutable data carriers
 - JPA entities and Spring beans: follow `spring-boot.md` (rule) and `spring-boot-best-practices` (skill)
 
+## Methods
+
+- Private methods that use no instance state (fields, injected beans), only their arguments and constants, are `static`; once a static helper is needed elsewhere, move it to a `@UtilityClass`
+
 ## Logging & Errors
 
 - **DO NOT** use `System.out`, `System.err` or `printStackTrace()`; use SLF4J via `@Slf4j`

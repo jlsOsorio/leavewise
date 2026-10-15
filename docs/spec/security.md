@@ -8,7 +8,7 @@
 - **Refresh token:** opaque 256-bit random value (base64url), TTL `JWT_REFRESH_TTL` (default `P7D`). Only its SHA-256 hex hash is stored in `refresh_token`.
   - **Rotation:** every refresh revokes the old row (`revoked_at`) and issues a new pair.
   - **Reuse detection:** a revoked token presented more than **10 s** after its `revoked_at` revokes all of that user's tokens → 401 `INVALID_REFRESH_TOKEN`. Within 10 s (concurrent refreshes from the proxy) it returns the same 401 without revoking the others.
-- **Revocation:** logout revokes the presented refresh token. A password change, or an ADMIN change to a user's role, company, location or active state, revokes all of that user's refresh tokens. Access tokens are never checked against the database: they stay valid until they expire (≤ `JWT_ACCESS_TTL`), accepted by design.
+- **Revocation:** logout revokes the presented refresh token; it is idempotent (unknown or already revoked tokens also get 204). A password change, or an ADMIN change to a user's role, company, location or active state, revokes all of that user's refresh tokens. Access tokens are never checked against the database: they stay valid until they expire (≤ `JWT_ACCESS_TTL`), accepted by design.
 - Inactive users cannot log in or refresh (`ACCOUNT_DISABLED`).
 - Passwords: BCrypt (`DelegatingPasswordEncoder`). Policy: at least 8 characters, at most 72 UTF-8 bytes (BCrypt's limit).
 

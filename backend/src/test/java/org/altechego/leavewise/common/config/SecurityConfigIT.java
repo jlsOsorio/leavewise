@@ -60,13 +60,13 @@ class SecurityConfigIT {
                 .andExpect(jsonPath("$.status").value("UP"));
     }
 
-    // FIXME: No auth controller yet: a 404 from MVC proves security let the request through
+    // An empty body fails Bean Validation: a 400 proves security let the request reach the controller
     @ParameterizedTest
     @ValueSource(strings = {"/api/auth/registration", "/api/auth/login", "/api/auth/refresh", "/api/auth/logout"})
     void publicAuthPath_unauthenticated_shouldPassSecurity(String path) throws Exception {
         mockMvc.perform(post(path).contentType(VERSIONED_JSON).accept(VERSIONED_JSON).content("{}"))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.code").value("NOT_FOUND"));
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"));
     }
 
     @Test
