@@ -1,15 +1,19 @@
 package org.altechego.leavewise.location.service.impl;
 
+import static org.altechego.leavewise.common.exception.ApiExceptionAssertions.assertErrorCode;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 
+import org.altechego.leavewise.common.exception.ErrorCode;
 import org.altechego.leavewise.company.entity.Company;
 import org.altechego.leavewise.company.repository.CompanyRepository;
+import org.altechego.leavewise.location.dto.LocationSummaryResponse;
 import org.altechego.leavewise.location.entity.CompanyLocation;
 import org.altechego.leavewise.location.mapper.LocationMapper;
 import org.altechego.leavewise.location.repository.CompanyLocationRepository;
@@ -22,6 +26,8 @@ import org.mapstruct.factory.Mappers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 @ExtendWith(MockitoExtension.class)
 class LocationServiceImplTest {
@@ -81,5 +87,27 @@ class LocationServiceImplTest {
         assertThat(response.companyId()).isEqualTo(COMPANY_ID);
         assertThat(response.municipalityId()).isEqualTo(MUNICIPALITY_ID);
         assertThat(response.name()).isEqualTo("Sede");
+    }
+
+    @Test
+    void findByCompany_existingCompany_shouldReturnPageOfLocationSummaries() {
+        var pageable = PageRequest.of(0, 20);
+        var location = CompanyLocation.builder().id(11L).name("Sede").build();
+        when(companyRepository.existsById(COMPANY_ID)).thenReturn(true);
+        when(locationRepository.findByCompanyId(COMPANY_ID, pageable))
+                .thenReturn(new PageImpl<>(List.of(location), pageable, 1));
+
+        var page = locationService.findByCompany(COMPANY_ID, pageable);
+
+        assertThat(page.content()).containsExactly(new LocationSummaryResponse(11L, "Sede"));
+        assertThat(page.totalElements()).isEqualTo(1);
+    }
+
+    @Test
+    void findByCompany_unknownCompany_shouldThrowNotFound() {
+        when(companyRepository.existsById(COMPANY_ID)).thenReturn(false);
+
+        assertErrorCode(() -> locationService.findByCompany(COMPANY_ID, PageRequest.of(0, 20)), ErrorCode.NOT_FOUND);
+        verify(locationRepository, never()).findByCompanyId(any(), any());
     }
 }
