@@ -56,7 +56,7 @@ public class SecurityConfig {
     public String[] publicPaths() {
         return new String[] {
                 "/api/auth/registration", "/api/auth/login", "/api/auth/refresh", "/api/auth/logout",
-                "/api/auth/companies/**", "/actuator/health"};
+                "/api/auth/companies", "/api/auth/companies/*/locations", "/actuator/health"};
     }
 
     @Bean

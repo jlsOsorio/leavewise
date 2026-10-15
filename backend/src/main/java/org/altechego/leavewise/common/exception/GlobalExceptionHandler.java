@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
+import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -53,6 +54,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({InvalidApiVersionException.class, MissingApiVersionException.class})
     public ProblemDetail handleApiVersion(Exception ex) {
         return problem(ErrorCode.UNSUPPORTED_API_VERSION, "Unsupported API version");
+    }
+
+    @ExceptionHandler(PropertyReferenceException.class)
+    public ProblemDetail handleUnknownSortProperty(PropertyReferenceException ex) {
+        return problem(ErrorCode.VALIDATION_ERROR, "Unknown sort property '%s'".formatted(ex.getPropertyName()));
     }
 
     @ExceptionHandler(Exception.class)

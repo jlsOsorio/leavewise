@@ -3,6 +3,8 @@ package org.altechego.leavewise.location.repository;
 import java.util.Optional;
 
 import org.altechego.leavewise.location.entity.CompanyLocation;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CompanyLocationRepository extends JpaRepository<CompanyLocation, Long> {
@@ -10,4 +12,6 @@ public interface CompanyLocationRepository extends JpaRepository<CompanyLocation
     Optional<CompanyLocation> findByCompanyIdAndName(Long companyId, String name);
 
     boolean existsByIdAndCompanyId(Long id, Long companyId);
+
+    Page<CompanyLocation> findByCompanyId(Long companyId, Pageable pageable);
 }

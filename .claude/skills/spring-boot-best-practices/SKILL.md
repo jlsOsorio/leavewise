@@ -39,6 +39,9 @@ What to do is owned elsewhere and always applies: JPA/entity conventions, REST f
 
 - `common/web/PageResponse<T>(content, page, size, totalElements, totalPages)` with `static from(Page<T>)`, so the JSON shape is ours (`SPEC.md` §5), not Spring's `PageImpl` serialization
 - Bound `size` via `spring.data.web.pageable.max-page-size=100` and `default-page-size=20`
+- Why `@SortDefault` and not `@PageableDefault`: the latter's own `size = 10` silently overrides `default-page-size`
+- Why restrict `sort` (`SortRestriction`): otherwise clients can order by fields the response hides (e.g. `passwordHash`, `nif`) and infer their values from the ordering
+- Safety net for an endpoint that skips the restriction: an unknown property throws `PropertyReferenceException` (package `org.springframework.data.core` in Spring Data 4), which `GlobalExceptionHandler` turns into the same 400
 
 ## Security config
 
