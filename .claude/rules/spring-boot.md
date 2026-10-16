@@ -14,6 +14,7 @@ org.altechego.leavewise/
   common/
     config/       WebConfig, SecurityConfig, ClockConfig, *Properties records
     exception/    ErrorCode, ApiException, GlobalExceptionHandler
+    security/     AuthenticatedUser (principal), Role, AuthenticatedUserConverter
     entity/       AuditableEntity (audit timestamps: created_at / updated_at)
     aop/          cross-cutting aspects
     web/          ApiMediaType, PageResponse
@@ -95,7 +96,7 @@ Error codes per status: `SPEC.md` §5.
 ## Security
 
 - **Never log** secrets, tokens or personal data (e.g. NIF)
-- Paths in `SecurityConfig` beans (`publicPaths`, `privatePaths`); roles via `@PreAuthorize`; ownership ("own data only", 404 otherwise) in the service via the authenticated principal
+- Paths in `SecurityConfig` beans (`publicPaths`, `privatePaths`); roles via `@PreAuthorize`; ownership ("own data only", 404 otherwise) in the service via the authenticated principal (`@AuthenticationPrincipal AuthenticatedUser actor` in the controller, passed to the service)
 
 ## Tests
 

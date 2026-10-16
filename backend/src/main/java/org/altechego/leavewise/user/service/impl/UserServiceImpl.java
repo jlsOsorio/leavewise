@@ -2,17 +2,19 @@ package org.altechego.leavewise.user.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.altechego.leavewise.common.security.Role;
 import org.altechego.leavewise.company.exception.CompanyNotFoundException;
 import org.altechego.leavewise.company.repository.CompanyRepository;
 import org.altechego.leavewise.location.repository.CompanyLocationRepository;
 import org.altechego.leavewise.user.constants.UserConstants;
+import org.altechego.leavewise.user.dto.MeResponse;
 import org.altechego.leavewise.user.dto.UserRegistrationRequest;
 import org.altechego.leavewise.user.dto.UserResponse;
 import org.altechego.leavewise.user.entity.LwUser;
-import org.altechego.leavewise.user.enums.Role;
 import org.altechego.leavewise.user.exception.EmailTakenException;
 import org.altechego.leavewise.user.exception.LocationCompanyMismatchException;
 import org.altechego.leavewise.user.exception.NifTakenException;
+import org.altechego.leavewise.user.exception.UserNotFoundException;
 import org.altechego.leavewise.user.mapper.UserMapper;
 import org.altechego.leavewise.user.repository.LwUserRepository;
 import org.altechego.leavewise.user.service.UserService;
@@ -91,6 +93,14 @@ public class UserServiceImpl implements UserService {
                 .build());
         log.info("Registered user {}", user.getId());
         return userMapper.toResponse(user);
+    }
+
+    // Access tokens outlive a deleted user by up to their TTL, so the id may no longer exist
+    @Override
+    public MeResponse findMe(Long userId) {
+        return lwUserRepository.findWithCompanyAndLocationById(userId)
+                .map(userMapper::toMeResponse)
+                .orElseThrow(() -> new UserNotFoundException(userId));
     }
 
     // A concurrent registration can pass the exists checks; the unique constraints still reject it

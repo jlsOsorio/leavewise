@@ -19,10 +19,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.altechego.leavewise.common.entity.AuditableEntity;
+import org.altechego.leavewise.common.security.Role;
 import org.altechego.leavewise.company.entity.Company;
 import org.altechego.leavewise.location.entity.CompanyLocation;
 import org.altechego.leavewise.user.constants.UserConstants;
-import org.altechego.leavewise.user.enums.Role;
 
 @Entity
 @Table(name = "lw_user")

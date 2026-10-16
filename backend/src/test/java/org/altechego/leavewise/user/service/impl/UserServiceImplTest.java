@@ -12,13 +12,16 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 import org.altechego.leavewise.common.exception.ErrorCode;
+import org.altechego.leavewise.common.security.Role;
+import org.altechego.leavewise.company.dto.CompanyResponse;
 import org.altechego.leavewise.company.entity.Company;
 import org.altechego.leavewise.company.repository.CompanyRepository;
+import org.altechego.leavewise.location.dto.LocationSummaryResponse;
 import org.altechego.leavewise.location.entity.CompanyLocation;
 import org.altechego.leavewise.location.repository.CompanyLocationRepository;
+import org.altechego.leavewise.user.dto.MeResponse;
 import org.altechego.leavewise.user.dto.UserRegistrationRequest;
 import org.altechego.leavewise.user.entity.LwUser;
-import org.altechego.leavewise.user.enums.Role;
 import org.altechego.leavewise.user.mapper.UserMapper;
 import org.altechego.leavewise.user.repository.LwUserRepository;
 import org.hibernate.exception.ConstraintViolationException;
@@ -201,6 +204,35 @@ class UserServiceImplTest {
         when(lwUserRepository.saveAndFlush(any(LwUser.class))).thenThrow(violation);
 
         assertThatThrownBy(() -> userService.register(request("ana@example.pt", null))).isSameAs(violation);
+    }
+
+    @Test
+    void findMe_existingUser_shouldReturnProfileWithCompanyAndLocationNames() {
+        var user = LwUser.builder()
+                .id(42L)
+                .name("Ana")
+                .email("ana@example.pt")
+                .nif("123456789")
+                .role(Role.USER)
+                .company(Company.builder().id(COMPANY_ID).name("LeaveWise").build())
+                .companyLocation(CompanyLocation.builder().id(LOCATION_ID).name("Sede").build())
+                .build();
+        when(lwUserRepository.findWithCompanyAndLocationById(42L)).thenReturn(Optional.of(user));
+
+        var me = userService.findMe(42L);
+
+        assertThat(me).isEqualTo(new MeResponse(
+                42L, "Ana", "ana@example.pt", "123456789", null, Role.USER,
+                new CompanyResponse(COMPANY_ID, "LeaveWise"),
+                new LocationSummaryResponse(LOCATION_ID, "Sede")));
+    }
+
+    // The access token is still valid, but the user was deleted meanwhile
+    @Test
+    void findMe_unknownUser_shouldThrowNotFound() {
+        when(lwUserRepository.findWithCompanyAndLocationById(42L)).thenReturn(Optional.empty());
+
+        assertErrorCode(() -> userService.findMe(42L), ErrorCode.NOT_FOUND);
     }
 
 

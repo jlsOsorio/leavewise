@@ -10,15 +10,15 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 
 @Configuration
 public class JwtConfig {
 
     public static final MacAlgorithm SIGNING_ALGORITHM = MacAlgorithm.HS256;
     public static final String ROLE_CLAIM = "role";
-    private static final String ROLE_PREFIX = "ROLE_";
+    public static final String EMAIL_CLAIM = "email";
+    public static final String COMPANY_ID_CLAIM = "companyId";
+    public static final String ROLE_PREFIX = "ROLE_";
     private static final String KEY_ALGORITHM = "HmacSHA256";
 
 
@@ -35,16 +35,5 @@ public class JwtConfig {
     @Bean
     public JwtDecoder jwtDecoder(SecretKey jwtSigningKey) {
         return NimbusJwtDecoder.withSecretKey(jwtSigningKey).macAlgorithm(SIGNING_ALGORITHM).build();
-    }
-
-    @Bean
-    public JwtAuthenticationConverter jwtAuthenticationConverter() {
-        var authorities = new JwtGrantedAuthoritiesConverter();
-        authorities.setAuthoritiesClaimName(ROLE_CLAIM);
-        authorities.setAuthorityPrefix(ROLE_PREFIX);
-
-        var converter = new JwtAuthenticationConverter();
-        converter.setJwtGrantedAuthoritiesConverter(authorities);
-        return converter;
     }
 }

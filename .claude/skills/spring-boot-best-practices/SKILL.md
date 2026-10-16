@@ -49,7 +49,7 @@ What to do is owned elsewhere and always applies: JPA/entity conventions, REST f
 - Deny by default: `publicPaths` → `permitAll`, `privatePaths` → `authenticated`, `anyRequest().denyAll()`
 - ADMIN-only endpoints use `@PreAuthorize("hasRole('ADMIN')")` (there is no `/admin` path prefix); `@EnableMethodSecurity` on `SecurityConfig`
 - Stateless session, CSRF disabled: only the Next.js BFF calls the backend, with a bearer token and no cookies (`docs/spec/security.md`)
-- OAuth2 Resource Server with a `JwtAuthenticationConverter` reading the `role` claim with prefix `ROLE_`
+- OAuth2 Resource Server with `common/security/AuthenticatedUserConverter`: it maps the `role` claim to `ROLE_<role>` and makes the principal an `AuthenticatedUser(id, email, role, companyId)` instead of the raw `Jwt`, so controllers get typed claims and no feature parses the token. It lives in `common`, not `auth`, because every feature injects the principal and `auth` already depends on `user`
 - `dispatcherTypeMatchers(ASYNC, ERROR).permitAll()`: authorization runs on every dispatch, so without it SSE emitters and error dispatches fail with AccessDenied after the response is committed
 - Passwords: `PasswordEncoderFactories.createDelegatingPasswordEncoder()` (BCrypt)
 

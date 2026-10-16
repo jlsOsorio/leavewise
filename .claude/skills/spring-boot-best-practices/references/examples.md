@@ -69,6 +69,7 @@ public class SecurityConfig {
             HttpSecurity http,
             @Qualifier("publicPaths") String[] publicPaths,
             @Qualifier("privatePaths") String[] privatePaths,
+            Converter<Jwt, AbstractAuthenticationToken> jwtAuthenticationConverter, // common/security/AuthenticatedUserConverter
             ProblemAuthenticationEntryPoint entryPoint,
             ProblemAccessDeniedHandler accessDeniedHandler) throws Exception {
 
@@ -81,22 +82,12 @@ public class SecurityConfig {
                         .requestMatchers(privatePaths).authenticated()
                         .anyRequest().denyAll())
                 .oauth2ResourceServer(rs -> rs
-                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter))
                         .authenticationEntryPoint(entryPoint))
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint(entryPoint)         // 401 UNAUTHENTICATED
                         .accessDeniedHandler(accessDeniedHandler))    // 403 FORBIDDEN
                 .build();
-    }
-
-    @Bean
-    public JwtAuthenticationConverter jwtAuthenticationConverter() {
-        var authorities = new JwtGrantedAuthoritiesConverter();
-        authorities.setAuthoritiesClaimName("role");
-        authorities.setAuthorityPrefix("ROLE_");
-        var converter = new JwtAuthenticationConverter();
-        converter.setJwtGrantedAuthoritiesConverter(authorities);
-        return converter;
     }
 
     @Bean

@@ -49,7 +49,7 @@ Web app for employees of Portuguese companies to manage vacations.
 /frontend  package.json, Dockerfile, src/{app,components,lib,test}/..., e2e/
 ```
 
-- **Backend packages (by feature):** `org.altechego.leavewise.{auth, user, company, location, municipality, schedule, holiday, policy, entitlement, vacation, suggestion, imports, file, ai, common}`. `common` holds `config/` (incl. `SecurityConfig`, `Clock` bean), `exception/`, `aop/`, `web/`, `messaging/`. Per-feature sub-packages and layering: `.claude/rules/spring-boot.md`.
+- **Backend packages (by feature):** `org.altechego.leavewise.{auth, user, company, location, municipality, schedule, holiday, policy, entitlement, vacation, suggestion, imports, file, ai, common}`. `common` holds `config/` (incl. `SecurityConfig`, `Clock` bean), `exception/`, `security/` (`AuthenticatedUser` principal, `Role`), `aop/`, `web/`, `messaging/`. Per-feature sub-packages and layering: `.claude/rules/spring-boot.md`.
 - **Frontend:** route groups `(auth)` and `(app)`, admin pages under `(app)/admin/`, shared code in `src/lib/{api, auth, schemas}` and `src/components/{ui, calendar, forms, layout}` for common components (the forms only if we have a common form layout). The specific components for each route should be inside the routes themselves, using the `_components` folder (this should include, for instance, the specific forms). Full tree in `docs/spec/frontend.md`.
 
 ## 4. Architecture
@@ -153,7 +153,7 @@ Backend: one `ErrorCode` enum holds these codes and their HTTP status. 405, 406,
 | [x] | M0 Monorepo scaffold, compose, CI skeleton, Flyway V1, seed                                       | `devops.md`, `security.md` (seeding), `docs/data-model.md`                                               |
 | [ ] | M1 Auth (register/login/refresh/logout), security config, BFF cookies + `proxy.ts`                | `security.md`, `api.md` (auth, public, me), `business-rules.md` (BR-1, BR-3), `frontend.md` (auth pages) |
 | [ ] | M2 Admin CRUD: municipalities, companies, locations, work schedule, policies, users, entitlements | `api.md`, `business-rules.md` (BR-8, 13, 14, 15), `frontend.md` (admin)                                  |
-| [ ] | M3 Holidays + generator; `/me/*` endpoints                                                        | `holidays.md`, `api.md` (holidays, me), `business-rules.md` (BR-6)                                       |
+| [ ] | M3 Holidays + generator; `PATCH /me` and `/me/*` endpoints                                        | `holidays.md`, `api.md` (holidays, me), `business-rules.md` (BR-6)                                       |
 | [ ] | M4 Vacations: calculator, balance, status machine, preview, calendar UI, approvals                | `business-rules.md`, `api.md` (vacations), `frontend.md` (calendar, vacations, approvals)                |
 | [ ] | M5 Import: storage, RabbitMQ, consumer, DLQ, SSE, UI                                              | `import.md`, `api.md` (imports), `frontend.md` (imports)                                                 |
 | [ ] | M6 Suggestions: engine, AI reason, UI                                                             | `suggestions.md`, `api.md` (suggestions), `frontend.md` (suggestions)                                    |
