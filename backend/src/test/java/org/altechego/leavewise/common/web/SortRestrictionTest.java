@@ -2,6 +2,7 @@ package org.altechego.leavewise.common.web;
 
 import static org.altechego.leavewise.common.exception.ApiExceptionAssertions.assertErrorCode;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Set;
 
@@ -33,5 +34,13 @@ class SortRestrictionTest {
         var pageable = PageRequest.of(0, 20, Sort.by("name", "createdAt"));
 
         assertErrorCode(() -> SortRestriction.requireAllowed(pageable, ALLOWED), ErrorCode.VALIDATION_ERROR);
+    }
+
+    @Test
+    void requireAllowed_disallowedProperty_shouldNameItAndListAllowedFieldsSorted() {
+        var pageable = PageRequest.of(0, 20, Sort.by("createdAt"));
+
+        assertThatThrownBy(() -> SortRestriction.requireAllowed(pageable, Set.of("name", "address")))
+                .hasMessage("Unsupported sort property 'createdAt'; allowed: address, name");
     }
 }
