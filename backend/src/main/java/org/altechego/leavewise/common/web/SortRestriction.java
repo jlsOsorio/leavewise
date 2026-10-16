@@ -14,7 +14,7 @@ public class SortRestriction {
                 .filter(order -> !allowedProperties.contains(order.getProperty()))
                 .findFirst()
                 .ifPresent(order -> {
-                    throw new UnsupportedSortPropertyException(order.getProperty());
+                    throw new UnsupportedSortPropertyException(order.getProperty(), allowedProperties);
                 });
     }
 }
