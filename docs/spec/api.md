@@ -23,7 +23,7 @@ Registration checks, in order: unknown `companyId` → 404 `NOT_FOUND`; location
 
 | Method      | Path               | Access | Notes                                                                                            |
 | ----------- | ------------------ | ------ | ------------------------------------------------------------------------------------------------ |
-| GET / PATCH | /me                | U      | PATCH: `name, contact, nif`                                                                      |
+| GET / PATCH | /me                | U      | GET → `{id,name,email,nif,contact,role,company:{id,name},companyLocation:{id,name}}`; PATCH: `name, contact, nif` |
 | PUT         | /me/password       | U      | `{currentPassword,newPassword}` → 204; revokes refresh tokens                                    |
 | GET         | /me/company        | U      | company, location + municipality, work schedule, current-year policy                             |
 | GET         | /me/holidays?year= | U      | Page of applicable holidays (BR-6)                                                               |

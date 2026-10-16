@@ -3,11 +3,11 @@ package org.altechego.leavewise.common.seed;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.altechego.leavewise.TestcontainersConfiguration;
+import org.altechego.leavewise.common.security.Role;
 import org.altechego.leavewise.company.repository.CompanyRepository;
 import org.altechego.leavewise.location.repository.CompanyLocationRepository;
 import org.altechego.leavewise.municipality.entity.Municipality;
 import org.altechego.leavewise.municipality.repository.MunicipalityRepository;
-import org.altechego.leavewise.user.enums.Role;
 import org.altechego.leavewise.user.repository.LwUserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

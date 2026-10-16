@@ -4,6 +4,8 @@ import jakarta.servlet.DispatcherType;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -11,7 +13,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -56,7 +58,7 @@ public class SecurityConfig {
             HttpSecurity http,
             @Qualifier("publicPaths") String[] publicPaths,
             @Qualifier("privatePaths") String[] privatePaths,
-            JwtAuthenticationConverter jwtAuthenticationConverter,
+            Converter<Jwt, AbstractAuthenticationToken> jwtAuthenticationConverter,
             AuthenticationEntryPoint problemAuthenticationEntryPoint,
             AccessDeniedHandler problemAccessDeniedHandler) {
 

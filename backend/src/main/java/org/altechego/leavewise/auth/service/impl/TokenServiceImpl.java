@@ -124,9 +124,9 @@ public class TokenServiceImpl implements TokenService {
     private String encodeAccessToken(UserResponse user, Instant issuedAt, Instant expiresAt) {
         var claims = JwtClaimsSet.builder()
                 .subject(user.id().toString())
-                .claim(AuthConstants.EMAIL_CLAIM, user.email())
+                .claim(JwtConfig.EMAIL_CLAIM, user.email())
                 .claim(JwtConfig.ROLE_CLAIM, user.role().name())
-                .claim(AuthConstants.COMPANY_ID_CLAIM, user.companyId())
+                .claim(JwtConfig.COMPANY_ID_CLAIM, user.companyId())
                 .issuedAt(issuedAt)
                 .expiresAt(expiresAt)
                 .build();
