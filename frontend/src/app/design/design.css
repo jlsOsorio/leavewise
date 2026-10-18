@@ -1,0 +1,30 @@
+/* TEMPORARY: accent candidates for the /design style tile. Emerald is the default in globals.css. */
+[data-accent='blue'] {
+  --primary: oklch(0.7 0.16 255);
+  --primary-foreground: oklch(0.18 0.03 255);
+  --ring: oklch(0.7 0.16 255 / 70%);
+  --sidebar-primary: oklch(0.7 0.16 255);
+  --chart-1: oklch(0.7 0.16 255);
+  --chart-2: oklch(0.57 0.13 255);
+  --chart-3: oklch(0.44 0.09 255);
+}
+
+[data-accent='amber'] {
+  --primary: oklch(0.8 0.14 75);
+  --primary-foreground: oklch(0.2 0.04 75);
+  --ring: oklch(0.8 0.14 75 / 70%);
+  --sidebar-primary: oklch(0.8 0.14 75);
+  --chart-1: oklch(0.8 0.14 75);
+  --chart-2: oklch(0.65 0.12 75);
+  --chart-3: oklch(0.5 0.09 75);
+}
+
+[data-accent='violet'] {
+  --primary: oklch(0.7 0.16 295);
+  --primary-foreground: oklch(0.18 0.04 295);
+  --ring: oklch(0.7 0.16 295 / 70%);
+  --sidebar-primary: oklch(0.7 0.16 295);
+  --chart-1: oklch(0.7 0.16 295);
+  --chart-2: oklch(0.57 0.13 295);
+  --chart-3: oklch(0.44 0.09 295);
+}
