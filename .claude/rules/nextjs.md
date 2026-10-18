@@ -7,6 +7,15 @@ paths:
 
 Always applies to frontend code. Version gotchas (async `cookies()`/`params`, `proxy.ts`, who may set cookies) are in `SPEC.md` §2; UI rules in `SPEC.md` §5 Frontend; pages and UX in `docs/spec/frontend.md`. Tests: `frontend-testing.md`. For how/why use the `modern-best-practice-nextjs`, `modern-best-practice-react-components` and `clean-typescript` skills.
 
+## Design reference
+
+- The visual template lives on branch `style/fe-design` (never merged): the `/design` page plus `globals.css`, `components/{ui,layout,forms}` and `hooks/`. It is a reference, not a source to merge
+- Chosen look: graphite dark base with the **emerald** accent (already the default tokens in the branch's `globals.css`)
+- Fonts: **IBM Plex Sans / IBM Plex Mono first**, Geist Sans / Geist Mono as fallback, loaded via `next/font/google` in `src/app/layout.tsx` (`--font-sans` = Plex, then Geist). The branch's root layout still uses Geist only: fix that when bringing it over
+- Bring files over only when a feature needs them, committed with that feature: `git checkout style/fe-design -- <path>`. Copy shadcn `ui/*` from the branch too (some are customised), not `shadcn add`
+- Before writing UI: reuse what's on the current branch → else copy from `style/fe-design` (`git show style/fe-design:<path>`; the `/design` page shows how pieces compose) → only then write new code, in the same style
+- Once copied, the file on main is the source of truth; adapt it freely
+
 ## Talking to the backend
 
 - Only server code calls the backend: `serverApi()` (`src/lib/api/server.ts`) for reads and Server Actions, Route Handlers for auth cookies, upload, SSE and download. Never from client components
