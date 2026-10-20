@@ -1,6 +1,7 @@
 import { http, HttpResponse, type RequestHandler } from 'msw';
 
 import type { TokenPair } from '@/lib/auth/token-pair';
+import { fakeJwt } from '@/test/jwt';
 
 const backend = (path: string) => `${process.env.BACKEND_URL}/api${path}`;
 
@@ -22,8 +23,17 @@ export function tokenPair(): TokenPair {
   };
 }
 
+export function refreshedPair(): TokenPair {
+  return {
+    ...tokenPair(),
+    accessToken: fakeJwt('USER', 15 * 60_000),
+    refreshToken: 'rotated-refresh-token',
+  };
+}
+
 // Default happy-path mocks of the backend
 export const handlers: RequestHandler[] = [
+  http.post(backend('/auth/refresh'), () => HttpResponse.json(refreshedPair())),
   http.post(backend('/auth/login'), () => HttpResponse.json(tokenPair())),
   http.post(backend('/auth/registration'), () =>
     HttpResponse.json(tokenPair(), { status: 201 }),
