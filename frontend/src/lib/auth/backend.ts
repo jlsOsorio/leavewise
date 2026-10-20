@@ -5,6 +5,7 @@ import {
   PROBLEM_MEDIA_TYPE,
   type ProblemDetail,
 } from '@/lib/api/problem-detail';
+import { problemResponse } from '@/lib/api/problem-response';
 import { setAuthCookies } from './cookies';
 import type { SessionResponse, TokenPair } from './token-pair';
 
@@ -24,14 +25,14 @@ export async function exchangeForSession(
   try {
     body = await request.json();
   } catch {
-    return problem(400, 'Bad Request', 'VALIDATION_ERROR');
+    return problemResponse(400, 'Bad Request', 'VALIDATION_ERROR');
   }
 
   let backend: Response;
   try {
     backend = await postAuth(path, body);
   } catch {
-    return problem(500, 'Internal Server Error', 'INTERNAL_ERROR');
+    return problemResponse(500, 'Internal Server Error', 'INTERNAL_ERROR');
   }
 
   if (!backend.ok) {
@@ -51,15 +52,4 @@ export async function exchangeForSession(
   );
   setAuthCookies(response, pair);
   return response;
-}
-
-function problem(
-  status: number,
-  title: string,
-  code: string,
-): NextResponse<ProblemDetail> {
-  return NextResponse.json<ProblemDetail>(
-    { status, title, code, timestamp: new Date().toISOString() },
-    { status, headers: { 'Content-Type': PROBLEM_MEDIA_TYPE } },
-  );
 }
