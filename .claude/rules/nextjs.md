@@ -44,8 +44,8 @@ Always applies to frontend code. Version gotchas (async `cookies()`/`params`, `p
 - The JWT decoded on the frontend (without verification) is for UX only (redirects, menus); the backend decides access
 - CSRF is handled centrally (`security.md` §Frontend): **DO NOT** add per-handler checks. GET Route Handlers never mutate
 - Backend 401:
-  - Server Actions and Route Handlers: clear both cookies, then redirect to `/login` (Server Action) or return 401 (Route Handler)
-  - Server Components can't set cookies: `redirect('/login')` (the proxy clears them there)
+  - Server Components and Server Actions: `serverApi()` calls `redirect('/login')`; the proxy clears both cookies there
+  - Route Handlers: clear both cookies and return 401 (they don't use `serverApi()`'s redirect)
   - Client callers of `/api/*` (upload, combobox, download) navigate to `/login?next=<current path>` on 401. SSE falls back to `router.refresh()`, which the proxy redirects
 
 ## Loading (skeletons, `SPEC.md` §5)
