@@ -42,4 +42,9 @@ export const handlers: RequestHandler[] = [
     backend('/auth/logout'),
     () => new HttpResponse(null, { status: 204 }),
   ),
+
+  // Our Route Handlers, as client components call them
+  http.post('/api/auth/login', () =>
+    HttpResponse.json({ user: { name: 'Ana Silva', role: 'USER' } }),
+  ),
 ];

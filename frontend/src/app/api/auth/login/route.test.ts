@@ -79,4 +79,22 @@ describe('POST /api/auth/login', () => {
     expect(response.status).toBe(400);
     expect(await response.json()).toMatchObject({ code: 'VALIDATION_ERROR' });
   });
+
+  test('rejects an invalid body with field errors before calling the backend', async () => {
+    const request = new NextRequest('http://localhost:3000/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email: 'ana', password: '' }),
+    });
+
+    const response = await POST(request);
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toMatchObject({
+      code: 'VALIDATION_ERROR',
+      errors: [
+        { field: 'email', message: 'Enter a valid email address.' },
+        { field: 'password', message: 'Enter your password.' },
+      ],
+    });
+  });
 });

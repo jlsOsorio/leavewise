@@ -60,5 +60,5 @@ Always applies to frontend code. Version gotchas (async `cookies()`/`params`, `p
 
 - Reads in Server Components via `serverApi()`
 - Mutations in Server Actions: Zod parse → backend → `revalidatePath` → return `{ok: true} | {ok: false, error: {code, message, fieldErrors?}}`
-- Forms: shadcn Form + react-hook-form + `zodResolver`; the same schema (`src/lib/schemas/`) runs in the Server Action
+- Forms: shadcn `Field` + react-hook-form `Controller` + `zodResolver`; the same schema (`src/lib/schemas/`) runs in the Server Action or Route Handler
 - Route-specific components live in the route's `_components/`; shared ones in `src/components/`

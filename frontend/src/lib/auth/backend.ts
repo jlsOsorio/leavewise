@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
+import type * as z from 'zod';
 
 import { API_MEDIA_TYPE } from '@/lib/api/media-type';
 import {
   PROBLEM_MEDIA_TYPE,
   type ProblemDetail,
 } from '@/lib/api/problem-detail';
-import { problemResponse } from '@/lib/api/problem-response';
+import { problemResponse, validationProblem } from '@/lib/api/problem-response';
 import { setAuthCookies } from './cookies';
 import type { SessionResponse, TokenPair } from './token-pair';
 
@@ -17,15 +18,25 @@ export function postAuth(path: string, body: unknown): Promise<Response> {
   });
 }
 
+// `schema` becomes required once registration has its schema (M1 register substep)
 export async function exchangeForSession(
   path: string,
   request: Request,
+  schema?: z.ZodType,
 ): Promise<NextResponse<SessionResponse | ProblemDetail>> {
   let body: unknown;
   try {
     body = await request.json();
   } catch {
     return problemResponse(400, 'Bad Request', 'VALIDATION_ERROR');
+  }
+
+  if (schema) {
+    const parsed = schema.safeParse(body);
+    if (!parsed.success) {
+      return validationProblem(parsed.error);
+    }
+    body = parsed.data;
   }
 
   let backend: Response;
