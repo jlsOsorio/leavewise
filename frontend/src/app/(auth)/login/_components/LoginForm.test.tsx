@@ -17,8 +17,8 @@ beforeEach(() => {
 
 async function signIn(email = 'ana@example.pt', password = 'secret123') {
   const user = userEvent.setup();
-  if (email) await user.type(screen.getByLabelText('Email'), email);
-  if (password) await user.type(screen.getByLabelText('Password'), password);
+  if (email) await user.type(screen.getByLabelText(/^Email/), email);
+  if (password) await user.type(screen.getByLabelText(/^Password/), password);
   await user.click(screen.getByRole('button', { name: 'Sign in' }));
 }
 
@@ -66,10 +66,10 @@ describe('LoginForm', () => {
     expect(
       await screen.findByText('Enter a valid email address.'),
     ).toBeVisible();
-    expect(screen.getByLabelText('Email')).toHaveAccessibleDescription(
+    expect(screen.getByLabelText(/^Email/)).toHaveAccessibleDescription(
       'Enter a valid email address.',
     );
-    expect(screen.getByLabelText('Password')).toHaveAccessibleDescription(
+    expect(screen.getByLabelText(/^Password/)).toHaveAccessibleDescription(
       'Enter your password.',
     );
     expect(login).not.toHaveBeenCalled();

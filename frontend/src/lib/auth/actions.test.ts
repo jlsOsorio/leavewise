@@ -3,7 +3,7 @@ import { http, HttpResponse } from 'msw';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { server } from '@/test/msw/server';
-import { login, logout } from './actions';
+import { login, logout, register } from './actions';
 
 type StoredCookie = { value: string; maxAge?: number; httpOnly?: boolean };
 
@@ -27,6 +27,7 @@ const redirect = vi.hoisted(() =>
 vi.mock('next/navigation', () => ({ redirect }));
 
 const LOGIN_URL = `${process.env.BACKEND_URL}/api/auth/login`;
+const REGISTRATION_URL = `${process.env.BACKEND_URL}/api/auth/registration`;
 const LOGOUT_URL = `${process.env.BACKEND_URL}/api/auth/logout`;
 const credentials = { email: 'ana@example.pt', password: 'secret123' };
 
@@ -96,6 +97,75 @@ describe('login', () => {
     expect(result).toMatchObject({
       ok: false,
       error: { code: 'INTERNAL_ERROR' },
+    });
+  });
+});
+
+describe('register', () => {
+  const registration = {
+    name: 'Ana Ferreira',
+    email: 'ana@example.pt',
+    password: 'secret123',
+    companyId: 1,
+    companyLocationId: 2,
+  };
+
+  test('stores both tokens in cookies', async () => {
+    const result = await register(registration);
+
+    expect(result).toEqual({ ok: true });
+    expect(cookieJar.get('lw_at')?.value).toBe('access-jwt');
+    expect(cookieJar.get('lw_rt')?.value).toBe('refresh-token');
+  });
+
+  test.each([
+    ['EMAIL_TAKEN', 'email', 'An account with this email already exists.'],
+    ['NIF_TAKEN', 'nif', 'An account with this NIF already exists.'],
+    ['LOCATION_COMPANY_MISMATCH', 'companyLocationId', expect.any(String)],
+  ])('returns %s as an error on %s', async (code, field, message) => {
+    server.use(http.post(REGISTRATION_URL, () => problem(409, { code })));
+
+    const result = await register(registration);
+
+    expect(result).toMatchObject({
+      ok: false,
+      error: { code, fieldErrors: { [field]: message } },
+    });
+    expect(cookieJar.size).toBe(0);
+  });
+
+  test('returns an unknown company as a form error', async () => {
+    server.use(
+      http.post(REGISTRATION_URL, () => problem(404, { code: 'NOT_FOUND' })),
+    );
+
+    const result = await register(registration);
+
+    expect(result).toEqual({
+      ok: false,
+      error: {
+        code: 'NOT_FOUND',
+        message: 'The requested item was not found.',
+        fieldErrors: undefined,
+      },
+    });
+  });
+
+  test('returns field errors for invalid input before calling the backend', async () => {
+    server.use(
+      http.post(REGISTRATION_URL, () =>
+        problem(500, { code: 'INTERNAL_ERROR' }),
+      ),
+    );
+
+    const result = await register({ ...registration, password: 'short' });
+
+    expect(result).toMatchObject({
+      ok: false,
+      error: {
+        code: 'VALIDATION_ERROR',
+        fieldErrors: { password: 'Use at least 8 characters.' },
+      },
     });
   });
 });

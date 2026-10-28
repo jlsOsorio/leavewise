@@ -3,11 +3,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 
+import { FormTextField } from '@/components/forms/FormTextField';
 import { Button } from '@/components/ui/button';
-import { Field, FieldError, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
+import { FieldError } from '@/components/ui/field';
 import type { ActionResult } from '@/lib/api/action-result';
 import { errorMessage } from '@/lib/api/errors';
 import { login } from '@/lib/auth/actions';
@@ -65,56 +65,22 @@ export function LoginForm({ next }: { next?: string }) {
       onSubmit={form.handleSubmit(onSubmit)}
       className="space-y-4"
     >
-      <Controller
+      <FormTextField
+        control={form.control}
         name="email"
-        control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor={field.name}>Email</FieldLabel>
-            <Input
-              {...field}
-              id={field.name}
-              type="email"
-              autoComplete="email"
-              placeholder="ana.ferreira@empresa.pt"
-              aria-invalid={fieldState.invalid}
-              aria-describedby={
-                fieldState.invalid ? `${field.name}-error` : undefined
-              }
-            />
-            {fieldState.invalid && (
-              <FieldError
-                id={`${field.name}-error`}
-                errors={[fieldState.error]}
-              />
-            )}
-          </Field>
-        )}
+        label="Email"
+        required
+        type="email"
+        autoComplete="email"
+        placeholder="ana.ferreira@empresa.pt"
       />
-      <Controller
-        name="password"
+      <FormTextField
         control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor={field.name}>Password</FieldLabel>
-            <Input
-              {...field}
-              id={field.name}
-              type="password"
-              autoComplete="current-password"
-              aria-invalid={fieldState.invalid}
-              aria-describedby={
-                fieldState.invalid ? `${field.name}-error` : undefined
-              }
-            />
-            {fieldState.invalid && (
-              <FieldError
-                id={`${field.name}-error`}
-                errors={[fieldState.error]}
-              />
-            )}
-          </Field>
-        )}
+        name="password"
+        label="Password"
+        required
+        type="password"
+        autoComplete="current-password"
       />
       {errors.root?.server && (
         <FieldError>{errors.root.server.message}</FieldError>
