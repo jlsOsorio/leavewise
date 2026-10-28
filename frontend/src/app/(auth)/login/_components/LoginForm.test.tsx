@@ -1,17 +1,18 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { http, HttpResponse } from 'msw';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { server } from '@/test/msw/server';
 import { LoginForm } from './LoginForm';
 
-const router = vi.hoisted(() => ({ replace: vi.fn(), refresh: vi.fn() }));
+const router = vi.hoisted(() => ({ replace: vi.fn() }));
 vi.mock('next/navigation', () => ({ useRouter: () => router }));
+
+const login = vi.hoisted(() => vi.fn());
+vi.mock('@/lib/auth/actions', () => ({ login }));
 
 beforeEach(() => {
   router.replace.mockClear();
-  router.refresh.mockClear();
+  login.mockReset().mockResolvedValue({ ok: true });
 });
 
 async function signIn(email = 'ana@example.pt', password = 'secret123') {
@@ -41,14 +42,13 @@ describe('LoginForm', () => {
   });
 
   test('shows the message for wrong credentials', async () => {
-    server.use(
-      http.post('/api/auth/login', () =>
-        HttpResponse.json(
-          { status: 401, code: 'INVALID_CREDENTIALS' },
-          { status: 401 },
-        ),
-      ),
-    );
+    login.mockResolvedValue({
+      ok: false,
+      error: {
+        code: 'INVALID_CREDENTIALS',
+        message: 'Incorrect email or password.',
+      },
+    });
     render(<LoginForm />);
 
     await signIn();
@@ -72,6 +72,33 @@ describe('LoginForm', () => {
     expect(screen.getByLabelText('Password')).toHaveAccessibleDescription(
       'Enter your password.',
     );
+    expect(login).not.toHaveBeenCalled();
+  });
+  test('shows a field error returned by the server under its field', async () => {
+    login.mockResolvedValue({
+      ok: false,
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: 'Check the highlighted fields.',
+        fieldErrors: { email: 'Email is too long.' },
+      },
+    });
+    render(<LoginForm />);
+
+    await signIn();
+
+    expect(await screen.findByText('Email is too long.')).toBeVisible();
     expect(router.replace).not.toHaveBeenCalled();
+  });
+
+  test('shows a generic error when the server cannot be reached', async () => {
+    login.mockRejectedValue(new TypeError('Failed to fetch'));
+    render(<LoginForm />);
+
+    await signIn();
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Something went wrong. Please try again.',
+    );
   });
 });

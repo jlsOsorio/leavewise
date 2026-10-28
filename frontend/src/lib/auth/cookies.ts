@@ -5,7 +5,9 @@ import type { TokenPair } from './token-pair';
 export const ACCESS_COOKIE = 'lw_at';
 export const REFRESH_COOKIE = 'lw_rt';
 
-type CookieOptions = NonNullable<Parameters<NextResponse['cookies']['set']>[2]>;
+// `response.cookies` in the proxy, `await cookies()` in Server Actions
+type CookieStore = Pick<NextResponse['cookies'], 'set'>;
+type CookieOptions = NonNullable<Parameters<CookieStore['set']>[2]>;
 
 function cookieOptions(maxAge: number): CookieOptions {
   return {
@@ -22,20 +24,20 @@ function secondsUntil(expiresAt: string): number {
   return Math.max(0, Math.floor((Date.parse(expiresAt) - Date.now()) / 1000));
 }
 
-export function setAuthCookies(response: NextResponse, pair: TokenPair): void {
-  response.cookies.set(
+export function setAuthCookies(store: CookieStore, pair: TokenPair): void {
+  store.set(
     ACCESS_COOKIE,
     pair.accessToken,
     cookieOptions(secondsUntil(pair.accessTokenExpiresAt)),
   );
-  response.cookies.set(
+  store.set(
     REFRESH_COOKIE,
     pair.refreshToken,
     cookieOptions(secondsUntil(pair.refreshTokenExpiresAt)),
   );
 }
 
-export function clearAuthCookies(response: NextResponse): void {
-  response.cookies.set(ACCESS_COOKIE, '', cookieOptions(0));
-  response.cookies.set(REFRESH_COOKIE, '', cookieOptions(0));
+export function clearAuthCookies(store: CookieStore): void {
+  store.set(ACCESS_COOKIE, '', cookieOptions(0));
+  store.set(REFRESH_COOKIE, '', cookieOptions(0));
 }

@@ -172,7 +172,7 @@ describe('proxy access', () => {
     expect(getRedirectUrl(response)).toBe(`${ORIGIN}/login?next=%2Fvacations`);
   });
 
-  test('clears both cookies on /login', async () => {
+  test('clears both cookies when /login is opened', async () => {
     const response = await proxy(
       request('/login', {
         cookies: {
@@ -186,6 +186,15 @@ describe('proxy access', () => {
       response.cookies.get('lw_at')?.maxAge,
       response.cookies.get('lw_rt')?.maxAge,
     ]).toEqual([0, 0]);
+  });
+
+  test('keeps the cookies the login action sets on its POST to /login', async () => {
+    const response = await proxy(
+      request('/login', { method: 'POST', origin: ORIGIN }),
+    );
+
+    expect(continues(response)).toBe(true);
+    expect(response.cookies.getAll()).toHaveLength(0);
   });
 
   test('lets an anonymous user reach /register', async () => {
@@ -218,7 +227,7 @@ describe('proxy access', () => {
 describe('proxy CSRF', () => {
   test('rejects a POST to /api from another origin with 403 FORBIDDEN', async () => {
     const response = await proxy(
-      request('/api/auth/login', {
+      request('/api/imports', {
         method: 'POST',
         origin: 'https://evil.example',
       }),
@@ -229,16 +238,18 @@ describe('proxy CSRF', () => {
   });
 
   test('rejects a POST to /api without an Origin header', async () => {
-    const response = await proxy(
-      request('/api/auth/login', { method: 'POST' }),
-    );
+    const response = await proxy(request('/api/imports', { method: 'POST' }));
 
     expect(response.status).toBe(403);
   });
 
-  test('lets a same-origin POST to /api/auth through without a session', async () => {
+  test('lets a same-origin POST to /api through', async () => {
     const response = await proxy(
-      request('/api/auth/login', { method: 'POST', origin: ORIGIN }),
+      request('/api/imports', {
+        method: 'POST',
+        origin: ORIGIN,
+        cookies: { lw_at: fakeJwt('USER', 5 * 60_000) },
+      }),
     );
 
     expect(continues(response)).toBe(true);

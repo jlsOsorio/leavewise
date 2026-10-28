@@ -8,8 +8,9 @@ import { Controller, useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { ApiError } from '@/lib/api/api-error';
+import type { ActionResult } from '@/lib/api/action-result';
 import { errorMessage } from '@/lib/api/errors';
+import { login } from '@/lib/auth/actions';
 import { safeNext } from '@/lib/auth/safe-next';
 import { type LoginInput, loginSchema } from '@/lib/schemas/auth';
 
@@ -27,13 +28,9 @@ export function LoginForm({ next }: { next?: string }) {
   });
 
   async function onSubmit(values: LoginInput) {
-    let response: Response;
+    let result: ActionResult;
     try {
-      response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
-      });
+      result = await login(values);
     } catch {
       form.setError('root.server', {
         message: errorMessage('INTERNAL_ERROR'),
@@ -41,24 +38,22 @@ export function LoginForm({ next }: { next?: string }) {
       return;
     }
 
-    if (response.ok) {
+    if (result.ok) {
       router.replace(safeNext(next));
-      router.refresh();
       return;
     }
 
-    const error = await ApiError.from(response);
     let shownOnField = false;
-    for (const { field, message } of error.errors ?? []) {
+    for (const [field, message] of Object.entries(
+      result.error.fieldErrors ?? {},
+    )) {
       if (isLoginField(field)) {
         form.setError(field, { message });
         shownOnField = true;
       }
     }
     if (!shownOnField) {
-      form.setError('root.server', {
-        message: errorMessage(error.code, error.detail),
-      });
+      form.setError('root.server', { message: result.error.message });
     }
   }
 

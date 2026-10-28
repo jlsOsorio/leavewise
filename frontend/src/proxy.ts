@@ -29,10 +29,12 @@ export async function proxy(request: NextRequest) {
   if (isApi && !SAFE_METHODS.has(request.method) && !isSameOrigin(request)) {
     return problemResponse(403, 'Forbidden', 'FORBIDDEN');
   }
+
   if (pathname.startsWith('/api/auth/') || PUBLIC_PAGES.has(pathname)) {
     const response = NextResponse.next();
-    if (pathname === '/login') {
-      clearAuthCookies(response); // the login page always starts a clean session
+
+    if (pathname === '/login' && request.method === 'GET') {
+      clearAuthCookies(response.cookies);
     }
     return response;
   }
@@ -42,7 +44,7 @@ export async function proxy(request: NextRequest) {
     const response = isApi
       ? problemResponse(401, 'Unauthorized', 'UNAUTHENTICATED')
       : NextResponse.redirect(loginUrl(request));
-    clearAuthCookies(response);
+    clearAuthCookies(response.cookies);
     return response;
   }
 
@@ -89,7 +91,7 @@ function withRefreshedCookies(
   session: Session,
 ): NextResponse {
   if (session.refreshed) {
-    setAuthCookies(response, session.refreshed);
+    setAuthCookies(response.cookies, session.refreshed);
   }
   return response;
 }

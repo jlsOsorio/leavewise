@@ -9,10 +9,6 @@ export type AuthUser = {
   companyLocationId: number;
 };
 
-export type SessionResponse = {
-  user: Pick<AuthUser, 'name' | 'role'>;
-};
-
 // Server-only: never sent to the browser.
 export type TokenPair = {
   accessToken: string;
