@@ -42,3 +42,8 @@ Always applies to frontend unit and component tests. What to test is owned by `S
 - Error or edge cases override a handler inside the test with `server.use(http.get(...))`; it is reset after the test
 - Assert on what the code does with the response (returned value, rendered UI), not on the request having been made
 - Use for: `serverApi()` and its error parsing, Server Actions, Route Handlers, client components calling `/api/*` (combobox, upload, download)
+
+## Server Actions
+
+- Test the action itself in the node environment (`// @vitest-environment node`): mock `next/headers` with a `vi.hoisted` cookie jar (`get`/`set`) and `next/navigation`'s `redirect` with a `vi.fn` that throws; the backend goes through MSW. Assert on the returned `ActionResult`, the cookies and the redirect target
+- Components that call an action mock its module with `vi.mock` and a `vi.hoisted` `vi.fn`, returning `ActionResult`s; the action's own behaviour stays in its test

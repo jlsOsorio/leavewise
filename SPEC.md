@@ -67,7 +67,8 @@ Browser ──(same-origin, httpOnly cookies)──> Next.js (BFF: RSC, Server A
 - The browser never calls the backend directly; the backend has no CORS config. Next.js is the only client.
 - **Reads:** Server Components via `serverApi()` (`lib/api/server.ts`), which reads the `lw_at` cookie and calls `BACKEND_URL`.
 - **JSON mutations:** Server Actions → Zod validation → backend → `revalidatePath`.
-- **Route Handlers** only for auth cookie operations, multipart upload, SSE streaming, file download and client-side picker search (GET lookups for comboboxes).
+- **Auth** (login, registration, logout) is Server Actions too; they set the cookies. Refresh happens in `proxy.ts`.
+- **Route Handlers** only for multipart upload, SSE streaming, file download and client-side picker search (GET lookups for comboboxes).
 - Business "today" = `LocalDate.now(clock)` with a `Clock` bean in `Europe/Lisbon`. Timestamps stored in UTC (`hibernate.jdbc.time_zone=UTC`).
 - **Authorization model:** roles `USER` and `ADMIN` (JWT claim → `ROLE_<role>`). `@PreAuthorize` for roles, ownership checks in services. **A USER requesting another user's resource gets 404, not 403.** Details in `docs/spec/security.md`.
 

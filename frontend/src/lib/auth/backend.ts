@@ -1,14 +1,10 @@
-import { NextResponse } from 'next/server';
-import type * as z from 'zod';
+import { cookies } from 'next/headers';
 
+import { type ActionResult, apiFailure } from '@/lib/api/action-result';
+import { ApiError } from '@/lib/api/api-error';
 import { API_MEDIA_TYPE } from '@/lib/api/media-type';
-import {
-  PROBLEM_MEDIA_TYPE,
-  type ProblemDetail,
-} from '@/lib/api/problem-detail';
-import { problemResponse, validationProblem } from '@/lib/api/problem-response';
 import { setAuthCookies } from './cookies';
-import type { SessionResponse, TokenPair } from './token-pair';
+import type { TokenPair } from './token-pair';
 
 export function postAuth(path: string, body: unknown): Promise<Response> {
   return fetch(`${process.env.BACKEND_URL}/api/auth${path}`, {
@@ -18,49 +14,22 @@ export function postAuth(path: string, body: unknown): Promise<Response> {
   });
 }
 
-// `schema` becomes required once registration has its schema (M1 register substep)
+// Posts validated credentials and stores the returned tokens as cookies; for Server Actions only
 export async function exchangeForSession(
   path: string,
-  request: Request,
-  schema?: z.ZodType,
-): Promise<NextResponse<SessionResponse | ProblemDetail>> {
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return problemResponse(400, 'Bad Request', 'VALIDATION_ERROR');
-  }
-
-  if (schema) {
-    const parsed = schema.safeParse(body);
-    if (!parsed.success) {
-      return validationProblem(parsed.error);
-    }
-    body = parsed.data;
-  }
-
+  body: unknown,
+): Promise<ActionResult> {
   let backend: Response;
   try {
     backend = await postAuth(path, body);
   } catch {
-    return problemResponse(500, 'Internal Server Error', 'INTERNAL_ERROR');
+    return apiFailure(new ApiError(500, 'INTERNAL_ERROR'));
   }
 
   if (!backend.ok) {
-    return new NextResponse<ProblemDetail>(backend.body, {
-      status: backend.status,
-      headers: {
-        'Content-Type':
-          backend.headers.get('Content-Type') ?? PROBLEM_MEDIA_TYPE,
-      },
-    });
+    return apiFailure(await ApiError.from(backend));
   }
 
-  const pair = (await backend.json()) as TokenPair;
-  const response = NextResponse.json<SessionResponse>(
-    { user: { name: pair.user.name, role: pair.user.role } },
-    { status: backend.status },
-  );
-  setAuthCookies(response, pair);
-  return response;
+  setAuthCookies(await cookies(), (await backend.json()) as TokenPair);
+  return { ok: true };
 }

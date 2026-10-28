@@ -8,9 +8,9 @@
 src/app/(auth)/login, (auth)/register
 src/app/(app)/calendar (home), vacations, imports, imports/[id], suggestions, profile
 src/app/(app)/admin/{companies, municipalities, users, holidays, policies, entitlements, schedules, approvals}
-src/app/api/auth/{login,registration,logout}/route.ts, api/auth/companies/route.ts (picker search)
+src/app/api/auth/companies/route.ts (picker search)
 src/app/api/imports/route.ts (upload), api/imports/[id]/events/route.ts (SSE proxy), api/imports/template/route.ts
-src/lib/api/{server.ts, errors.ts, media-type.ts}  src/lib/auth/  src/lib/schemas/  src/lib/dates.ts
+src/lib/api/{server.ts, errors.ts, media-type.ts, action-result.ts}  src/lib/auth/ (actions.ts: login, registration, logout)  src/lib/schemas/  src/lib/dates.ts
 src/components/{ui (shadcn), calendar, forms, layout}
 src/proxy.ts
 src/test/{setup.ts, utils.tsx (custom render, when needed), msw/{handlers.ts, server.ts}}

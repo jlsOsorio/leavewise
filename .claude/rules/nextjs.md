@@ -18,7 +18,7 @@ Always applies to frontend code. Version gotchas (async `cookies()`/`params`, `p
 
 ## Talking to the backend
 
-- Only server code calls the backend: `serverApi()` (`src/lib/api/server.ts`) for reads and Server Actions, Route Handlers for auth cookies, upload, SSE and download. Never from client components
+- Only server code calls the backend: `serverApi()` (`src/lib/api/server.ts`) for reads and Server Actions, Route Handlers for upload, SSE, download and picker search. Never from client components
 - Media type and version come from one module, `src/lib/api/media-type.ts` (`API_MEDIA_TYPE = 'application/vnd.leavewise+json;version=1'`; value owned by `SPEC.md` §5). **DO NOT** hardcode it elsewhere
 
 | Request                        | `Accept`                       | `Content-Type`             |
@@ -42,6 +42,7 @@ Always applies to frontend code. Version gotchas (async `cookies()`/`params`, `p
 
 - **Never** pass a token to a client component or return it in a response body; pass only display fields (name, role). Who may set cookies: `SPEC.md` §2
 - The JWT decoded on the frontend (without verification) is for UX only (redirects, menus); the backend decides access
+- Auth is Server Actions (`src/lib/auth/actions.ts`): they set cookies via `cookies()` and return an `ActionResult`; the form then navigates with `router.replace(safeNext(next))`. Don't `redirect()` from an action the form awaits: the redirect rejects the awaited promise
 - CSRF is handled centrally (`security.md` §Frontend): **DO NOT** add per-handler checks. GET Route Handlers never mutate
 - Backend 401:
   - Server Components and Server Actions: `serverApi()` calls `redirect('/login')`; the proxy clears both cookies there
@@ -60,5 +61,5 @@ Always applies to frontend code. Version gotchas (async `cookies()`/`params`, `p
 
 - Reads in Server Components via `serverApi()`
 - Mutations in Server Actions: Zod parse → backend → `revalidatePath` → return `{ok: true} | {ok: false, error: {code, message, fieldErrors?}}`
-- Forms: shadcn `Field` + react-hook-form `Controller` + `zodResolver`; the same schema (`src/lib/schemas/`) runs in the Server Action or Route Handler
+- Forms: shadcn `Field` + react-hook-form `Controller` + `zodResolver`; the same schema (`src/lib/schemas/`) runs in the Server Action. Results are built with `src/lib/api/action-result.ts` (`apiFailure`, `validationFailure`); the form maps `fieldErrors` with `setError` and shows other errors as a form-level `root.server` error
 - Route-specific components live in the route's `_components/`; shared ones in `src/components/`
