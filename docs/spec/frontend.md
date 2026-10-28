@@ -22,7 +22,7 @@ Sidebar: Calendar, Vacations, Suggestions, Imports, Profile, plus an Admin secti
 
 ## Pages
 
-- **Login / Register:** register has a company picker (searchable Combobox, `.claude/rules/nextjs.md`), then a plain location select loaded for that company; Zod validation includes the NIF check digit (BR-3), the email pattern and the password policy. The credentials are email + password.
+- **Login / Register:** register has a company picker (searchable Combobox, `.claude/rules/nextjs.md`), then a plain location select loaded for that company; Zod validation includes the NIF check digit (BR-3), the email pattern and the password policy. The credentials are email + password. A signed-in user opening either page goes to `next` or `/`; `/login?session=expired` shows "Your session has expired" (`security.md` §Frontend).
 - **Calendar (home):**
   - Year selector; month grid on the shadcn `Calendar` in range mode.
   - Legend: non-working days (muted), holidays (tooltip with name), vacations by status (PENDING amber, ACCEPTED green, REJECTED/CANCELLED struck through), suggestions (dashed outline).

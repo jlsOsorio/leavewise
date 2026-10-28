@@ -45,7 +45,7 @@ Always applies to frontend code. Version gotchas (async `cookies()`/`params`, `p
 - Auth is Server Actions (`src/lib/auth/actions.ts`): they set cookies via `cookies()` and return an `ActionResult`; the form then navigates with `router.replace(safeNext(next))`. Don't `redirect()` from an action the form awaits: the redirect rejects the awaited promise
 - CSRF is handled centrally (`security.md` §Frontend): **DO NOT** add per-handler checks. GET Route Handlers never mutate
 - Backend 401:
-  - Server Components and Server Actions: `serverApi()` calls `redirect('/login')`; the proxy clears both cookies there
+  - Server Components and Server Actions: `serverApi()` calls `redirect('/login?session=expired')`; the proxy clears both cookies there and the page says the session expired. A plain `/login` sends a signed-in user on to `next`
   - Route Handlers: clear both cookies and return 401 (they don't use `serverApi()`'s redirect)
   - Client callers of `/api/*` (upload, combobox, download) navigate to `/login?next=<current path>` on 401. SSE falls back to `router.refresh()`, which the proxy redirects
 

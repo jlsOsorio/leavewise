@@ -85,13 +85,13 @@ describe('serverApi', () => {
     ).resolves.toBeUndefined();
   });
 
-  test('redirects to /login on 401', async () => {
+  test('redirects to /login with session=expired on 401', async () => {
     server.use(
       http.get(ME_URL, () => problem(401, { code: 'UNAUTHENTICATED' })),
     );
 
     await expect(serverApi('/me')).rejects.toMatchObject({
-      digest: expect.stringContaining('/login'),
+      digest: expect.stringContaining('/login?session=expired'),
     });
   });
 

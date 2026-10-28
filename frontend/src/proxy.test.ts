@@ -172,9 +172,39 @@ describe('proxy access', () => {
     expect(getRedirectUrl(response)).toBe(`${ORIGIN}/login?next=%2Fvacations`);
   });
 
-  test('clears both cookies when /login is opened', async () => {
+  test('redirects a signed-in user from /login to next', async () => {
     const response = await proxy(
-      request('/login', {
+      request('/login?next=%2Fvacations', {
+        cookies: { lw_at: fakeJwt('USER', 5 * 60_000) },
+      }),
+    );
+
+    expect(getRedirectUrl(response)).toBe(`${ORIGIN}/vacations`);
+  });
+
+  test('redirects a signed-in user to / when next points to another site', async () => {
+    const response = await proxy(
+      request('/login?next=%2F%2Fevil.example', {
+        cookies: { lw_at: fakeJwt('USER', 5 * 60_000) },
+      }),
+    );
+
+    expect(getRedirectUrl(response)).toBe(`${ORIGIN}/`);
+  });
+
+  test('redirects a signed-in user from /register to /', async () => {
+    const response = await proxy(
+      request('/register', {
+        cookies: { lw_at: fakeJwt('USER', 5 * 60_000) },
+      }),
+    );
+
+    expect(getRedirectUrl(response)).toBe(`${ORIGIN}/`);
+  });
+
+  test('shows /login and clears both cookies after the backend rejected the session', async () => {
+    const response = await proxy(
+      request('/login?session=expired', {
         cookies: {
           lw_at: fakeJwt('USER', 5 * 60_000),
           lw_rt: newRefreshToken(),
@@ -182,6 +212,26 @@ describe('proxy access', () => {
       }),
     );
 
+    expect(continues(response)).toBe(true);
+    expect([
+      response.cookies.get('lw_at')?.maxAge,
+      response.cookies.get('lw_rt')?.maxAge,
+    ]).toEqual([0, 0]);
+  });
+
+  test('shows /login and clears both cookies when the session cannot be used', async () => {
+    failRefresh();
+
+    const response = await proxy(
+      request('/login', {
+        cookies: {
+          lw_at: fakeJwt('USER', -60_000),
+          lw_rt: newRefreshToken(),
+        },
+      }),
+    );
+
+    expect(continues(response)).toBe(true);
     expect([
       response.cookies.get('lw_at')?.maxAge,
       response.cookies.get('lw_rt')?.maxAge,

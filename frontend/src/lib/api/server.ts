@@ -33,7 +33,7 @@ export async function serverApi<T>(
   });
 
   if (response.status === 401) {
-    redirect('/login');
+    redirect('/login?session=expired');
   }
   if (!response.ok) {
     throw await ApiError.from(response);
