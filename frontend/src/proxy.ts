@@ -13,6 +13,7 @@ import {
   msUntilExpiry,
 } from '@/lib/auth/jwt';
 import { refreshTokens } from '@/lib/auth/refresh';
+import { safeNext } from '@/lib/auth/safe-next';
 import type { TokenPair } from '@/lib/auth/token-pair';
 
 // Refresh when the access token is missing or expires within this margin
@@ -30,13 +31,11 @@ export async function proxy(request: NextRequest) {
     return problemResponse(403, 'Forbidden', 'FORBIDDEN');
   }
 
-  if (pathname.startsWith('/api/auth/') || PUBLIC_PAGES.has(pathname)) {
-    const response = NextResponse.next();
-
-    if (pathname === '/login' && request.method === 'GET') {
-      clearAuthCookies(response.cookies);
-    }
-    return response;
+  if (pathname.startsWith('/api/auth/')) {
+    return NextResponse.next();
+  }
+  if (PUBLIC_PAGES.has(pathname)) {
+    return publicPage(request);
   }
 
   const session = await resolveSession(request);
@@ -65,6 +64,32 @@ export async function proxy(request: NextRequest) {
     NextResponse.next({ request: { headers: request.headers } }),
     session,
   );
+}
+
+// Signed-in users skip /login and /register; anyone else gets a clean session.
+// `serverApi()` sends `?session=expired` when the backend rejected a token that still looks
+// valid here: honouring the session then would redirect back and forth
+async function publicPage(request: NextRequest): Promise<NextResponse> {
+  if (request.method !== 'GET') {
+    return NextResponse.next();
+  }
+
+  const { searchParams } = request.nextUrl;
+  const session =
+    searchParams.get('session') === 'expired'
+      ? null
+      : await resolveSession(request);
+  if (session) {
+    const target = safeNext(searchParams.get('next') ?? undefined);
+    return withRefreshedCookies(
+      NextResponse.redirect(new URL(target, request.url)),
+      session,
+    );
+  }
+
+  const response = NextResponse.next();
+  clearAuthCookies(response.cookies);
+  return response;
 }
 
 async function resolveSession(request: NextRequest): Promise<Session | null> {

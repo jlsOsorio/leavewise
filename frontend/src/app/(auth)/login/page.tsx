@@ -1,12 +1,13 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+import { errorMessage } from '@/lib/api/errors';
 import { LoginForm } from './_components/LoginForm';
 
 export const metadata: Metadata = { title: 'Sign in' };
 
 export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
-  const { next } = await searchParams;
+  const { next, session } = await searchParams;
 
   return (
     <div className="space-y-6">
@@ -16,6 +17,11 @@ export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
           Use the email you registered with.
         </p>
       </div>
+      {session === 'expired' && (
+        <p role="status" className="text-warning">
+          {errorMessage('UNAUTHENTICATED')}
+        </p>
+      )}
       <LoginForm next={typeof next === 'string' ? next : undefined} />
       <p className="text-muted-foreground">
         New to LeaveWise?{' '}

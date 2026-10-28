@@ -41,7 +41,7 @@ Seed values are validated at startup (`SeedProperties`): a missing required valu
   - **CSRF:** cookies are SameSite=Lax; the proxy rejects non-GET/HEAD requests to `/api/*` whose `Origin` doesn't match the host (403), the only check `/api/auth/*` gets. Server Actions, including the auth actions, are origin-checked by Next.js (`Origin` vs `Host`/`X-Forwarded-Host`).
   - **Refresh:** when `lw_at` is missing or expires within 60 s and `lw_rt` exists, decodes `exp` without verification, calls the backend `/auth/refresh`, sets both cookies on the response and forwards the updated `Cookie` header. If the refresh fails while `lw_at` is still valid, continues without touching the cookies. Refreshes are single-flight per refresh token (in memory, keyed by its SHA-256): concurrent requests share one backend call and a successful result is reused for 10 s (the backend grace window), so racing requests all get the new pair.
   - **Unauthenticated** (no usable `lw_at`): clears both cookies; page requests are redirected to `/login?next=…`, `/api/*` requests get 401 ProblemDetail `UNAUTHENTICATED`. Public pages: `/login`, `/register`.
-  - On GET `/login`, clears both cookies (opening the login page starts a clean session). POSTs to `/login` are the login action and keep the cookies it sets.
+  - GET `/login` or `/register` with a usable session redirects to the safe `next` (or `/`); without one, clears both cookies. `/login?session=expired` (sent by `serverApi()` on a backend 401) always clears them: the backend rejected a token the proxy would still accept, so honouring it would loop. POSTs to these pages are the auth actions and keep the cookies they set.
   - Redirects non-ADMIN users away from `/admin/**` (role decoded from the JWT).
 - 401 handling in `serverApi()`, Server Actions and client callers: `.claude/rules/nextjs.md` §Auth.
 
@@ -49,4 +49,4 @@ Seed values are validated at startup (`SeedProperties`): a missing required valu
 
 - Unit: token service (issue, rotation, reuse inside and outside the grace window, expiry), password policy, NIF validator (BR-3).
 - IT: register/login/refresh/logout flows, inactive user, reuse after the grace window revokes all, role change revokes refresh tokens, every **P** path reachable without a token and other paths 401, 401 vs 403 vs 404, seeding idempotency.
-- Vitest: `proxy.ts` (refresh decision, failed refresh with valid vs expired `lw_at`, Origin rejection, `/api/*` 401 vs page redirect, POST `/login` keeps cookies), auth actions (cookies set or cleared, backend errors, validation), auth form schemas (password byte limit).
+- Vitest: `proxy.ts` (refresh decision, failed refresh with valid vs expired `lw_at`, Origin rejection, `/api/*` 401 vs page redirect, signed-in redirect from `/login` and `/register`, `session=expired` clears, POST `/login` keeps cookies), auth actions (cookies set or cleared, backend errors, validation), auth form schemas (password byte limit).

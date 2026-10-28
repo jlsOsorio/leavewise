@@ -1,0 +1,6 @@
+# LF everywhere (matches Prettier), whatever the local core.autocrlf
+* text=auto eol=lf
+
+# Windows scripts need CRLF
+*.cmd text eol=crlf
+*.bat text eol=crlf
