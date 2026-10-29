@@ -1,8 +1,11 @@
 import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server';
 
 import { type ActionResult, apiFailure } from '@/lib/api/action-result';
 import { ApiError } from '@/lib/api/api-error';
 import { API_MEDIA_TYPE } from '@/lib/api/media-type';
+import { PROBLEM_MEDIA_TYPE } from '@/lib/api/problem-detail';
+import { problemResponse } from '@/lib/api/problem-response';
 import { setAuthCookies } from './cookies';
 import type { TokenPair } from './token-pair';
 
@@ -32,4 +35,29 @@ export async function exchangeForSession(
 
   setAuthCookies(await cookies(), (await backend.json()) as TokenPair);
   return { ok: true };
+}
+
+// Proxies a public GET (`/auth/...`, no token) for the register pickers; the response passes
+// through as is, errors included
+export async function getPublicAuth(
+  path: string,
+  query: Record<string, string>,
+): Promise<NextResponse> {
+  const url = new URL(`/api/auth${path}`, process.env.BACKEND_URL);
+  for (const [key, value] of Object.entries(query)) {
+    url.searchParams.set(key, value);
+  }
+
+  let backend: Response;
+  try {
+    backend = await fetch(url, { headers: { Accept: API_MEDIA_TYPE } });
+  } catch {
+    return problemResponse(500, 'Internal Server Error', 'INTERNAL_ERROR');
+  }
+  return new NextResponse(backend.body, {
+    status: backend.status,
+    headers: {
+      'Content-Type': backend.headers.get('Content-Type') ?? PROBLEM_MEDIA_TYPE,
+    },
+  });
 }

@@ -3,15 +3,17 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 
 import { FormTextField } from '@/components/forms/FormTextField';
+import { RequiredMark } from '@/components/forms/RequiredMark';
 import { Button } from '@/components/ui/button';
-import { FieldError } from '@/components/ui/field';
+import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import type { ActionResult } from '@/lib/api/action-result';
 import { errorMessage } from '@/lib/api/errors';
 import { register } from '@/lib/auth/actions';
 import { type RegistrationInput, registrationSchema } from '@/lib/schemas/auth';
+import { CompanyCombobox } from './CompanyCombobox';
 import { PickerPlaceholder } from './PickerPlaceholder';
 
 const FIELDS = [
@@ -119,11 +121,32 @@ export function RegisterForm() {
         type="tel"
         autoComplete="tel"
       />
-      <PickerPlaceholder
+      <Controller
         control={form.control}
         name="companyId"
-        label="Company"
-        placeholder="Search for your company"
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor={field.name}>
+              Company
+              <RequiredMark />
+            </FieldLabel>
+            <CompanyCombobox
+              id={field.name}
+              ref={field.ref}
+              onChange={(company) => field.onChange(company.id)}
+              invalid={fieldState.invalid}
+              describedBy={
+                fieldState.invalid ? `${field.name}-error` : undefined
+              }
+            />
+            {fieldState.invalid && (
+              <FieldError
+                id={`${field.name}-error`}
+                errors={[fieldState.error]}
+              />
+            )}
+          </Field>
+        )}
       />
       <PickerPlaceholder
         control={form.control}
