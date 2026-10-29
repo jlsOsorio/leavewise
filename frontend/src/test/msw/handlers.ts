@@ -1,5 +1,6 @@
 import { http, HttpResponse, type RequestHandler } from 'msw';
 
+import type { Page } from '@/lib/api/page';
 import type { TokenPair } from '@/lib/auth/token-pair';
 import { fakeJwt } from '@/test/jwt';
 
@@ -31,6 +32,10 @@ export function refreshedPair(): TokenPair {
   };
 }
 
+export function page<T>(content: T[], totalElements = content.length): Page<T> {
+  return { content, page: 0, size: 20, totalElements, totalPages: 1 };
+}
+
 // Default happy-path mocks of the backend
 export const handlers: RequestHandler[] = [
   http.post(backend('/auth/refresh'), () => HttpResponse.json(refreshedPair())),
@@ -41,5 +46,13 @@ export const handlers: RequestHandler[] = [
   http.post(
     backend('/auth/logout'),
     () => new HttpResponse(null, { status: 204 }),
+  ),
+  http.get(backend('/auth/companies'), () =>
+    HttpResponse.json(page([{ id: 1, name: 'Acme Lda' }])),
+  ),
+
+  // Route Handlers
+  http.get('/api/auth/companies', () =>
+    HttpResponse.json(page([{ id: 1, name: 'Acme Lda' }])),
   ),
 ];

@@ -14,7 +14,7 @@ export function PickerPlaceholder({
   placeholder,
 }: {
   control: Control<RegistrationInput>;
-  name: 'companyId' | 'companyLocationId';
+  name: 'companyLocationId';
   label: string;
   placeholder: string;
 }) {
