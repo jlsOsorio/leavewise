@@ -1,8 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
+import { toast } from 'sonner';
 import { beforeEach, expect, test, vi } from 'vitest';
 
+import { Toaster } from '@/components/ui/sonner';
 import { page } from '@/test/msw/handlers';
 import { server } from '@/test/msw/server';
 import { RegisterForm } from './RegisterForm';
@@ -16,6 +18,7 @@ vi.mock('@/lib/auth/actions', () => ({ register }));
 beforeEach(() => {
   router.replace.mockClear();
   register.mockReset().mockResolvedValue({ ok: true });
+  toast.dismiss();
 });
 
 async function chooseCompany(user: UserEvent, name: string) {
@@ -50,6 +53,23 @@ test('creates the account and goes to the home page', async () => {
   expect(register).toHaveBeenCalledWith(
     expect.objectContaining({ companyId: 1, companyLocationId: 2 }),
   );
+});
+
+test('confirms the new account with a toast', async () => {
+  render(
+    <>
+      <RegisterForm />
+      <Toaster />
+    </>,
+  );
+  const user = userEvent.setup();
+  await fillValidForm(user);
+
+  await submit(user);
+
+  expect(
+    await screen.findByText('Account created. Welcome to LeaveWise!'),
+  ).toBeInTheDocument();
 });
 
 test('shows a taken email under the email field', async () => {
