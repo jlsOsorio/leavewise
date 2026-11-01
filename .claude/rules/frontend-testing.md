@@ -28,6 +28,7 @@ Always applies to frontend unit and component tests. What to test is owned by `S
 
 - Query by role, label or text (`getByRole`, `getByLabelText`), as a user would; `getByTestId` only as a last resort
 - Interactions with `@testing-library/user-event`, not `fireEvent`
+- A component that suspends on `use(promise)` at first render renders inside `await act(async () => { render(...) })`: React 19 retries the suspended render only there (disable `testing-library/no-unnecessary-act` on that line). Suspending after a user event needs nothing extra
 - Components needing a React context (providers): render through `src/test/utils.tsx`, created when the first provider is needed:
   - A `renderWithContext(ui, options)` that wraps `ui` in the required providers
   - Re-exports everything from `@testing-library/react` and exports `renderWithContext` **as `render`**

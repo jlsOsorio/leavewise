@@ -144,6 +144,13 @@ export function CompanyCombobox({
               onSelect={handleSelect}
             />
           </CommandList>
+          {search.status === 'done' &&
+            search.total > search.companies.length && (
+              <p className="border-t px-3 py-2 text-xs text-muted-foreground">
+                Showing {search.companies.length} of {search.total}. Keep typing
+                to narrow the list.
+              </p>
+            )}
         </Command>
       </PopoverContent>
     </Popover>
@@ -188,8 +195,6 @@ function SearchResults({
             onSelect={() => onSelect(company)}
             className={cn(
               'hover:bg-foreground/6',
-              // The chosen company keeps the hover shade (also when cmdk highlights it) and the
-              // default cursor, so it reads as the current choice rather than a link
               company.id === selectedId
                 ? 'bg-foreground/6 data-selected:bg-foreground/6'
                 : 'cursor-pointer',
@@ -202,12 +207,6 @@ function SearchResults({
           </CommandItem>
         ))}
       </CommandGroup>
-      {search.total > search.companies.length && (
-        <p className="px-3 py-2 text-xs text-muted-foreground">
-          Showing {search.companies.length} of {search.total}. Keep typing to
-          narrow the list.
-        </p>
-      )}
     </>
   );
 }
