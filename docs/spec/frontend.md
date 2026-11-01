@@ -1,12 +1,12 @@
 # Frontend
 
-> Milestones: M1 (auth pages, layout), M2 (admin), M4 (calendar, vacations, approvals), M5 (imports), M6 (suggestions), M7 (Playwright). Depends on: BFF and cookies (`security.md`), endpoints (`api.md`), error codes (`SPEC.md` §5).
+> Milestones: M1 (auth pages, header), M2 (admin, sidebar and user menu), M4 (calendar, vacations, approvals), M5 (imports), M6 (suggestions), M7 (Playwright). Depends on: BFF and cookies (`security.md`), endpoints (`api.md`), error codes (`SPEC.md` §5).
 
 ## Page tree
 
 ```
 src/app/(auth)/login, (auth)/register
-src/app/(app)/calendar (home), vacations, imports, imports/[id], suggestions, profile
+src/app/(app)/layout.tsx (header), page.tsx (placeholder home until the calendar, M4), calendar (home), vacations, imports, imports/[id], suggestions, profile
 src/app/(app)/admin/{companies, municipalities, users, holidays, policies, entitlements, schedules, approvals}
 src/app/api/auth/companies/route.ts (picker search), api/auth/companies/[id]/locations/route.ts (location select)
 src/app/api/imports/route.ts (upload), api/imports/[id]/events/route.ts (SSE proxy), api/imports/template/route.ts
@@ -18,7 +18,8 @@ src/test/{setup.ts, utils.tsx (custom render, when needed), msw/{handlers.ts, se
 
 ## Layout
 
-Sidebar: Calendar, Vacations, Suggestions, Imports, Profile, plus an Admin section for ADMIN. Header: user name, company, logout.
+- **Header (M1):** app name, user name and company from `GET /me` (streamed behind a skeleton), and a logout button.
+- **Sidebar and user menu (M2):** Calendar, Vacations, Suggestions, Imports, Profile, plus an Admin section for ADMIN; the header's user details and logout move into a user menu with Profile. Reference: `AppShell` on `style/fe-design`.
 
 ## Pages
 
