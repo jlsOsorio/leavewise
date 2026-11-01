@@ -1,5 +1,6 @@
 import { http, HttpResponse, type RequestHandler } from 'msw';
 
+import type { Me } from '@/lib/api/me';
 import type { Page } from '@/lib/api/page';
 import type { TokenPair } from '@/lib/auth/token-pair';
 import { fakeJwt } from '@/test/jwt';
@@ -57,6 +58,18 @@ export const handlers: RequestHandler[] = [
   ),
   http.get(backend('/auth/companies/:id/locations'), () =>
     HttpResponse.json(page(LOCATIONS)),
+  ),
+  http.get(backend('/me'), () =>
+    HttpResponse.json({
+      id: 1,
+      name: 'Ana Silva',
+      email: 'ana@example.pt',
+      nif: null,
+      contact: null,
+      role: 'USER',
+      company: { id: 1, name: 'Acme Lda' },
+      companyLocation: LOCATIONS[0],
+    } satisfies Me),
   ),
 
   // Route Handlers
