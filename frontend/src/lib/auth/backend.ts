@@ -17,7 +17,6 @@ export function postAuth(path: string, body: unknown): Promise<Response> {
   });
 }
 
-// Posts validated credentials and stores the returned tokens as cookies; for Server Actions only
 export async function exchangeForSession(
   path: string,
   body: unknown,
@@ -37,8 +36,7 @@ export async function exchangeForSession(
   return { ok: true };
 }
 
-// Proxies a public GET (`/auth/...`, no token) for the register pickers; the response passes
-// through as is, errors included
+// Proxies a public GET (no token)
 export async function getPublicAuth(
   path: string,
   query: Record<string, string>,
