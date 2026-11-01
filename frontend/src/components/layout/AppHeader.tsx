@@ -4,6 +4,7 @@ import { Suspense } from 'react';
 import { HeaderUser } from './HeaderUser';
 import { HeaderUserBoundary } from './HeaderUserBoundary';
 import { HeaderUserSkeleton } from './HeaderUserSkeleton';
+import { LogoutForm } from './LogoutForm';
 
 export function AppHeader() {
   return (
@@ -23,12 +24,13 @@ export function AppHeader() {
         </span>
         LeaveWise
       </Link>
-      <div className="ml-auto">
+      <div className="ml-auto flex items-center gap-3">
         <HeaderUserBoundary>
           <Suspense fallback={<HeaderUserSkeleton />}>
             <HeaderUser />
           </Suspense>
         </HeaderUserBoundary>
+        <LogoutForm />
       </div>
     </header>
   );
