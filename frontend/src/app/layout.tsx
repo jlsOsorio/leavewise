@@ -6,6 +6,7 @@ import {
   IBM_Plex_Sans,
 } from 'next/font/google';
 
+import { Toaster } from '@/components/ui/sonner';
 import './globals.css';
 
 const plexSans = IBM_Plex_Sans({
@@ -41,7 +42,10 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
       lang="en"
       className={`dark ${plexSans.variable} ${plexMono.variable} ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        {children}
+        <Toaster />
+      </body>
     </html>
   );
 }

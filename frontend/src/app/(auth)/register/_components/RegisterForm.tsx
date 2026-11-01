@@ -5,6 +5,7 @@ import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 import { FormTextField } from '@/components/forms/FormTextField';
 import { RequiredMark } from '@/components/forms/RequiredMark';
@@ -69,6 +70,7 @@ export function RegisterForm() {
     }
 
     if (result.ok) {
+      toast.success('Account created. Welcome to LeaveWise!');
       router.replace('/');
       return;
     }
