@@ -3,6 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 import { FormTextField } from '@/components/forms/FormTextField';
@@ -13,8 +14,12 @@ import type { ActionResult } from '@/lib/api/action-result';
 import { errorMessage } from '@/lib/api/errors';
 import { register } from '@/lib/auth/actions';
 import { type RegistrationInput, registrationSchema } from '@/lib/schemas/auth';
-import { CompanyCombobox } from './CompanyCombobox';
-import { PickerPlaceholder } from './PickerPlaceholder';
+import { type Company, CompanyCombobox } from './CompanyCombobox';
+import {
+  type CompanyLocation,
+  loadLocations,
+  LocationSelect,
+} from './LocationSelect';
 
 const FIELDS = [
   'name',
@@ -42,6 +47,15 @@ export function RegisterForm() {
       contact: '',
     },
   });
+  const [locations, setLocations] = useState<Promise<
+    CompanyLocation[] | null
+  > | null>(null);
+
+  function handleCompanyChange(company: Company) {
+    form.setValue('companyId', company.id, { shouldValidate: true });
+    form.resetField('companyLocationId');
+    setLocations(loadLocations(company.id));
+  }
 
   async function onSubmit(values: RegistrationInput) {
     let result: ActionResult;
@@ -95,7 +109,7 @@ export function RegisterForm() {
         required
         type="email"
         autoComplete="email"
-        placeholder="ines.carvalho@empresa.pt"
+        placeholder="ana.ferreira@empresa.pt"
       />
       <FormTextField
         control={form.control}
@@ -133,7 +147,7 @@ export function RegisterForm() {
             <CompanyCombobox
               id={field.name}
               ref={field.ref}
-              onChange={(company) => field.onChange(company.id)}
+              onChange={handleCompanyChange}
               invalid={fieldState.invalid}
               describedBy={
                 fieldState.invalid ? `${field.name}-error` : undefined
@@ -148,11 +162,34 @@ export function RegisterForm() {
           </Field>
         )}
       />
-      <PickerPlaceholder
+      <Controller
         control={form.control}
         name="companyLocationId"
-        label="Location"
-        placeholder="Choose a company first"
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor={field.name}>
+              Location
+              <RequiredMark />
+            </FieldLabel>
+            <LocationSelect
+              id={field.name}
+              ref={field.ref}
+              locations={locations}
+              value={field.value}
+              onChange={field.onChange}
+              invalid={fieldState.invalid}
+              describedBy={
+                fieldState.invalid ? `${field.name}-error` : undefined
+              }
+            />
+            {fieldState.invalid && (
+              <FieldError
+                id={`${field.name}-error`}
+                errors={[fieldState.error]}
+              />
+            )}
+          </Field>
+        )}
       />
       {errors.root?.server && (
         <FieldError>{errors.root.server.message}</FieldError>

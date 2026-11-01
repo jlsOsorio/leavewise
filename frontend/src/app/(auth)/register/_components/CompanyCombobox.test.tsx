@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { delay, http, HttpResponse } from 'msw';
 import { describe, expect, test, vi } from 'vitest';
 
@@ -37,7 +37,7 @@ function renderCombobox(onChange = vi.fn()) {
   return { user: userEvent.setup(), onChange };
 }
 
-const openCombobox = (user: ReturnType<typeof userEvent.setup>) =>
+const openCombobox = (user: UserEvent) =>
   user.click(screen.getByRole('combobox', { name: 'Company' }));
 
 describe('CompanyCombobox', () => {
@@ -82,6 +82,21 @@ describe('CompanyCombobox', () => {
     expect(
       screen.queryByRole('option', { name: 'Old Co' }),
     ).not.toBeInTheDocument();
+  });
+
+  test('tells how many companies match when only the first page is listed', async () => {
+    server.use(
+      http.get(COMPANIES_PATH, () =>
+        HttpResponse.json(page([{ id: 1, name: 'Acme Lda' }], 500)),
+      ),
+    );
+    const { user } = renderCombobox();
+
+    await openCombobox(user);
+
+    expect(
+      await screen.findByText(/Showing 1 of 500\. Keep typing/),
+    ).toBeVisible();
   });
 
   test('says so when no company matches', async () => {

@@ -4,7 +4,7 @@ import { afterAll, afterEach, beforeAll } from 'vitest';
 
 import { server } from './msw/server';
 
-// jsdom lacks these; Radix Popover and cmdk call them (node-environment tests have no DOM)
+// jsdom lacks these; Radix Popover, Radix Select and cmdk call them (node-environment tests have no DOM)
 if (typeof window !== 'undefined') {
   window.ResizeObserver ??= class {
     observe() {}
@@ -12,6 +12,8 @@ if (typeof window !== 'undefined') {
     disconnect() {}
   };
   Element.prototype.scrollIntoView ??= () => undefined;
+  Element.prototype.hasPointerCapture ??= () => false;
+  Element.prototype.releasePointerCapture ??= () => undefined;
 }
 
 // Fail on any request without a handler, so tests never reach a real network

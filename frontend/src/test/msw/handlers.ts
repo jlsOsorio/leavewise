@@ -36,6 +36,11 @@ export function page<T>(content: T[], totalElements = content.length): Page<T> {
   return { content, page: 0, size: 20, totalElements, totalPages: 1 };
 }
 
+const LOCATIONS = [
+  { id: 1, name: 'Lisboa' },
+  { id: 2, name: 'Porto' },
+];
+
 // Default happy-path mocks of the backend
 export const handlers: RequestHandler[] = [
   http.post(backend('/auth/refresh'), () => HttpResponse.json(refreshedPair())),
@@ -50,9 +55,15 @@ export const handlers: RequestHandler[] = [
   http.get(backend('/auth/companies'), () =>
     HttpResponse.json(page([{ id: 1, name: 'Acme Lda' }])),
   ),
+  http.get(backend('/auth/companies/:id/locations'), () =>
+    HttpResponse.json(page(LOCATIONS)),
+  ),
 
   // Route Handlers
   http.get('/api/auth/companies', () =>
     HttpResponse.json(page([{ id: 1, name: 'Acme Lda' }])),
+  ),
+  http.get('/api/auth/companies/:id/locations', () =>
+    HttpResponse.json(page(LOCATIONS)),
   ),
 ];
