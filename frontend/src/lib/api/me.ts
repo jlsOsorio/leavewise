@@ -1,3 +1,5 @@
+import { cache } from 'react';
+
 import type { Role } from '@/lib/auth/token-pair';
 import { serverApi } from './server';
 
@@ -14,6 +16,4 @@ export type Me = {
   companyLocation: Reference;
 };
 
-export function getMe(): Promise<Me> {
-  return serverApi<Me>('/me');
-}
+export const getMe = cache((): Promise<Me> => serverApi<Me>('/me'));

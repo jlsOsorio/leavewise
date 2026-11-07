@@ -19,7 +19,7 @@ src/test/{setup.ts, utils.tsx (custom render, when needed), msw/{handlers.ts, se
 ## Layout
 
 - **Header (M1):** app name, user name and company from `GET /me` (streamed behind a skeleton), and a logout button.
-- **Sidebar and user menu (M2):** Calendar, Vacations, Suggestions, Imports, Profile, plus an Admin section for ADMIN; the header's user details and logout move into a user menu with Profile. Reference: `AppShell` on `style/fe-design`.
+- **Sidebar and user menu (M2):** Calendar, Vacations, Suggestions, Imports, Profile, plus an Admin section for ADMIN; the header's user details and logout move into a user menu with Profile. Items appear only once their page exists (`components/layout/nav.ts`). Reference: `AppShell` on `style/fe-design`.
 
 ## Pages
 
