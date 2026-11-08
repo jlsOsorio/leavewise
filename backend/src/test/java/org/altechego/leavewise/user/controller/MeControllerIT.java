@@ -6,13 +6,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import com.jayway.jsonpath.JsonPath;
 import org.altechego.leavewise.TestcontainersConfiguration;
-import org.altechego.leavewise.common.config.JwtConfig;
+import org.altechego.leavewise.common.security.Role;
+import org.altechego.leavewise.common.security.TestAccessTokens;
 import org.altechego.leavewise.common.web.ApiMediaType;
 import org.altechego.leavewise.company.repository.CompanyRepository;
 import org.altechego.leavewise.location.repository.CompanyLocationRepository;
@@ -23,10 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.oauth2.jwt.JwsHeader;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -139,15 +135,7 @@ class MeControllerIT {
     }
 
     private String bearerFor(long userId) {
-        var now = Instant.now();
-        var claims = JwtClaimsSet.builder()
-                .subject(Long.toString(userId))
-                .claim(JwtConfig.ROLE_CLAIM, "USER")
-                .issuedAt(now)
-                .expiresAt(now.plus(15, ChronoUnit.MINUTES))
-                .build();
-        var header = JwsHeader.with(JwtConfig.SIGNING_ALGORITHM).build();
-        return "Bearer " + jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
+        return TestAccessTokens.bearer(jwtEncoder, userId, Role.USER, null);
     }
 
     private static String uniqueEmail() {
