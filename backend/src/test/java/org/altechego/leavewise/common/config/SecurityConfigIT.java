@@ -12,6 +12,7 @@ import java.time.temporal.ChronoUnit;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.altechego.leavewise.TestcontainersConfiguration;
+import org.altechego.leavewise.common.security.TestAccessTokens;
 import org.altechego.leavewise.common.web.ApiMediaType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,10 +24,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.oauth2.jwt.JwsHeader;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
@@ -215,14 +213,7 @@ class SecurityConfigIT {
     }
 
     private String bearer(String role, Instant issuedAt, Instant expiresAt) {
-        var claims = JwtClaimsSet.builder()
-                .subject("1")
-                .claim(JwtConfig.ROLE_CLAIM, role)
-                .issuedAt(issuedAt)
-                .expiresAt(expiresAt)
-                .build();
-        var header = JwsHeader.with(JwtConfig.SIGNING_ALGORITHM).build();
-        return "Bearer " + jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
+        return TestAccessTokens.bearer(jwtEncoder, 1L, role, null, issuedAt, expiresAt);
     }
 
 

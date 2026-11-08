@@ -36,7 +36,7 @@ Registration checks, in order: unknown `companyId` → 404 `NOT_FOUND`; location
 | --------- | ---------------------------------------------------------- | -------------- | ------------------------------------------------------------------------- |
 | CRUD      | /companies[/{id}]                                          | A (GET: U own) |                                                                           |
 | CRUD      | /companies/{id}/locations, /locations/{id}                 | A              |                                                                           |
-| CRUD      | /municipalities[/{id}]                                     | A (GET: U)     |                                                                           |
+| CRUD      | /municipalities[/{id}]?q                                   | A (GET: U)     | `{name,district,country?}`, blank country → Portugal; see below           |
 | GET / PUT | /companies/{id}/work-schedule                              | A (GET: U own) | PUT `{name, days:[{dayOfWeek,isWorkingDay}]}`, exactly 7 entries (upsert) |
 | CRUD      | /companies/{id}/vacation-policies, /vacation-policies/{id} | A (GET: U own) |                                                                           |
 | CRUD      | /holidays[/{id}]?year&municipalityId&type                  | A              |                                                                           |
@@ -44,6 +44,8 @@ Registration checks, in order: unknown `companyId` → 404 `NOT_FOUND`; location
 | CRUD      | /users[/{id}]?companyId&role&active&q                      | A              | PUT may change role, company, location, isActive                          |
 | PUT       | /users/{id}/password                                       | A              | reset → 204; revokes refresh tokens                                       |
 | CRUD      | /users/{id}/entitlements, /entitlements/{id}               | A              | unique (user, year)                                                       |
+
+Municipalities: `q` = case-insensitive contains on name; sort `name` (default), `district`, `country`. Name + district + country are unique ignoring case (`DUPLICATE`); deleting one still used by a location or holiday → `RESOURCE_IN_USE` (BR-15).
 
 ## Vacations
 

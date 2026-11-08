@@ -2,6 +2,7 @@ package org.altechego.leavewise.user.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.altechego.leavewise.common.exception.ConstraintViolations;
 import org.altechego.leavewise.common.security.Role;
 import org.altechego.leavewise.company.exception.CompanyNotFoundException;
 import org.altechego.leavewise.company.repository.CompanyRepository;
@@ -19,7 +20,6 @@ import org.altechego.leavewise.user.mapper.UserMapper;
 import org.altechego.leavewise.user.repository.LwUserRepository;
 import org.altechego.leavewise.user.service.UserService;
 import org.altechego.leavewise.user.util.EmailNormalizer;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -113,10 +113,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private static RuntimeException duplicateUserException(DataIntegrityViolationException ex) {
-        var constraint = ex.getCause() instanceof ConstraintViolationException violation
-                ? violation.getConstraintName()
-                : null;
-        return switch (constraint) {
+        return switch (ConstraintViolations.nameOf(ex)) {
             case UserConstants.EMAIL_UNIQUE_CONSTRAINT -> new EmailTakenException();
             case UserConstants.NIF_UNIQUE_CONSTRAINT -> new NifTakenException();
             case null, default -> ex;

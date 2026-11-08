@@ -13,5 +13,7 @@ public interface CompanyLocationRepository extends JpaRepository<CompanyLocation
 
     boolean existsByIdAndCompanyId(Long id, Long companyId);
 
+    boolean existsByMunicipalityId(Long municipalityId);
+
     Page<CompanyLocation> findByCompanyId(Long companyId, Pageable pageable);
 }
