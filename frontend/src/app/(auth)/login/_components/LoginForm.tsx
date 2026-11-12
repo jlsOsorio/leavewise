@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 
 import { FormTextField } from '@/components/forms/FormTextField';
+import { showActionError } from '@/components/forms/show-action-error';
 import { Button } from '@/components/ui/button';
 import { FieldError } from '@/components/ui/field';
 import type { ActionResult } from '@/lib/api/action-result';
@@ -15,10 +16,6 @@ import { safeNext } from '@/lib/auth/safe-next';
 import { type LoginInput, loginSchema } from '@/lib/schemas/auth';
 
 const FIELDS = ['email', 'password'] as const satisfies (keyof LoginInput)[];
-
-function isLoginField(field: string): field is keyof LoginInput {
-  return (FIELDS as readonly string[]).includes(field);
-}
 
 export function LoginForm({ next }: { next?: string }) {
   const router = useRouter();
@@ -43,18 +40,7 @@ export function LoginForm({ next }: { next?: string }) {
       return;
     }
 
-    let shownOnField = false;
-    for (const [field, message] of Object.entries(
-      result.error.fieldErrors ?? {},
-    )) {
-      if (isLoginField(field)) {
-        form.setError(field, { message });
-        shownOnField = true;
-      }
-    }
-    if (!shownOnField) {
-      form.setError('root.server', { message: result.error.message });
-    }
+    showActionError(form, result.error, FIELDS);
   }
 
   const { isSubmitting, errors } = form.formState;

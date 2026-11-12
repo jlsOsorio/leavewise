@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 
 import { FormTextField } from '@/components/forms/FormTextField';
 import { RequiredMark } from '@/components/forms/RequiredMark';
+import { showActionError } from '@/components/forms/show-action-error';
 import { Button } from '@/components/ui/button';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import type { ActionResult } from '@/lib/api/action-result';
@@ -31,10 +32,6 @@ const FIELDS = [
   'companyId',
   'companyLocationId',
 ] as const satisfies (keyof RegistrationInput)[];
-
-function isRegistrationField(field: string): field is keyof RegistrationInput {
-  return (FIELDS as readonly string[]).includes(field);
-}
 
 export function RegisterForm() {
   const router = useRouter();
@@ -75,18 +72,7 @@ export function RegisterForm() {
       return;
     }
 
-    let shownOnField = false;
-    for (const [field, message] of Object.entries(
-      result.error.fieldErrors ?? {},
-    )) {
-      if (isRegistrationField(field)) {
-        form.setError(field, { message });
-        shownOnField = true;
-      }
-    }
-    if (!shownOnField) {
-      form.setError('root.server', { message: result.error.message });
-    }
+    showActionError(form, result.error, FIELDS);
   }
 
   const { isSubmitting, errors } = form.formState;
