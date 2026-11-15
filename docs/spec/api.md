@@ -34,8 +34,8 @@ Registration checks, in order: unknown `companyId` → 404 `NOT_FOUND`; location
 
 | Method    | Path                                                       | Access         | Notes                                                                     |
 | --------- | ---------------------------------------------------------- | -------------- | ------------------------------------------------------------------------- |
-| CRUD      | /companies[/{id}]                                          | A (GET: U own) |                                                                           |
-| CRUD      | /companies/{id}/locations, /locations/{id}                 | A              |                                                                           |
+| CRUD      | /companies[/{id}]?q                                        | A (GET: U own) | `{name}`; see below                                                       |
+| CRUD      | /companies/{id}/locations, /locations/{id}                 | A              | `{name,address?,municipalityId}`; see below                               |
 | CRUD      | /municipalities[/{id}]?q                                   | A (GET: U)     | `{name,district,country?}`, blank country → Portugal; see below           |
 | GET / PUT | /companies/{id}/work-schedule                              | A (GET: U own) | PUT `{name, days:[{dayOfWeek,isWorkingDay}]}`, exactly 7 entries (upsert) |
 | CRUD      | /companies/{id}/vacation-policies, /vacation-policies/{id} | A (GET: U own) |                                                                           |
@@ -44,6 +44,8 @@ Registration checks, in order: unknown `companyId` → 404 `NOT_FOUND`; location
 | CRUD      | /users[/{id}]?companyId&role&active&q                      | A              | PUT may change role, company, location, isActive                          |
 | PUT       | /users/{id}/password                                       | A              | reset → 204; revokes refresh tokens                                       |
 | CRUD      | /users/{id}/entitlements, /entitlements/{id}               | A              | unique (user, year)                                                       |
+
+Companies: `q` = case-insensitive contains on name; sort `name` only. The list is ADMIN only; a USER may GET only their own company by id (another id → 404). Names are unique (`DUPLICATE`). Deleting a company with users → `RESOURCE_IN_USE` (BR-15); its locations, schedule and policies are deleted with it.
 
 Municipalities: `q` = case-insensitive contains on name; sort `name` (default), `district`, `country`. Name + district + country are unique ignoring case (`DUPLICATE`); deleting one still used by a location or holiday → `RESOURCE_IN_USE` (BR-15).
 
