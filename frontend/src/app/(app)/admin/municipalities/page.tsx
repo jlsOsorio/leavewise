@@ -2,6 +2,7 @@ import { Plus } from 'lucide-react';
 import type { Metadata } from 'next';
 
 import { type Column, DataTable } from '@/components/layout/data-table';
+import { SearchForm } from '@/components/forms/search-form';
 import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
 import type { Municipality } from '@/lib/api/municipalities';
@@ -11,7 +12,6 @@ import { MUNICIPALITY_NAME_MAX_LENGTH } from '@/lib/schemas/municipality';
 import { pageParam, textParam } from '@/lib/search-params';
 import { MunicipalityFormDialog } from './_components/municipality-form-dialog';
 import { MunicipalityRowActions } from './_components/municipality-row-actions';
-import { MunicipalitySearch } from './_components/municipality-search';
 
 export const metadata: Metadata = { title: 'Municipalities' };
 
@@ -63,7 +63,12 @@ export default async function MunicipalitiesPage({
           </MunicipalityFormDialog>
         }
       />
-      <MunicipalitySearch query={query} />
+      <SearchForm
+        action={PAGE_PATH}
+        label="Search municipalities by name"
+        query={query}
+        maxLength={MUNICIPALITY_NAME_MAX_LENGTH}
+      />
       <DataTable
         caption="Municipalities"
         columns={COLUMNS}
