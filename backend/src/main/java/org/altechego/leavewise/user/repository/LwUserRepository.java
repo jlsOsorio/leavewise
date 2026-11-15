@@ -14,6 +14,9 @@ public interface LwUserRepository extends JpaRepository<LwUser, Long> {
 
     boolean existsByNif(String nif);
 
+    boolean existsByCompanyId(Long companyId);
+
+
     @EntityGraph(attributePaths = {"company", "companyLocation"})
     Optional<LwUser> findWithCompanyAndLocationById(Long id);
 }
