@@ -1,3 +1,10 @@
 package org.altechego.leavewise.location.dto;
 
-public record LocationResponse(Long id, Long companyId, Long municipalityId, String name, String address) {}
+import org.altechego.leavewise.municipality.dto.MunicipalityResponse;
+
+public record LocationResponse(
+        Long id,
+        Long companyId,
+        String name,
+        String address,
+        MunicipalityResponse municipality) {}

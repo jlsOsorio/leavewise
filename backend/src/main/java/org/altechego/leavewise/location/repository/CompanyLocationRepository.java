@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.altechego.leavewise.location.entity.CompanyLocation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CompanyLocationRepository extends JpaRepository<CompanyLocation, Long> {
@@ -16,4 +17,10 @@ public interface CompanyLocationRepository extends JpaRepository<CompanyLocation
     boolean existsByMunicipalityId(Long municipalityId);
 
     Page<CompanyLocation> findByCompanyId(Long companyId, Pageable pageable);
+
+    @EntityGraph(attributePaths = "municipality")
+    Page<CompanyLocation> findWithMunicipalityByCompanyId(Long companyId, Pageable pageable);
+
+    @EntityGraph(attributePaths = "municipality")
+    Optional<CompanyLocation> findWithMunicipalityById(Long id);
 }

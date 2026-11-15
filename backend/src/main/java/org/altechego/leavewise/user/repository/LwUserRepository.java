@@ -16,6 +16,7 @@ public interface LwUserRepository extends JpaRepository<LwUser, Long> {
 
     boolean existsByCompanyId(Long companyId);
 
+    boolean existsByCompanyLocationId(Long companyLocationId);
 
     @EntityGraph(attributePaths = {"company", "companyLocation"})
     Optional<LwUser> findWithCompanyAndLocationById(Long id);
