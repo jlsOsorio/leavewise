@@ -89,6 +89,23 @@ export const handlers: RequestHandler[] = [
     () => new HttpResponse(null, { status: 204 }),
   ),
 
+  http.post(backend('/companies'), async ({ request }) =>
+    HttpResponse.json(
+      { id: 10, ...((await request.json()) as object) },
+      { status: 201 },
+    ),
+  ),
+  http.put(backend('/companies/:id'), async ({ params, request }) =>
+    HttpResponse.json({
+      id: Number(params.id),
+      ...((await request.json()) as object),
+    }),
+  ),
+  http.delete(
+    backend('/companies/:id'),
+    () => new HttpResponse(null, { status: 204 }),
+  ),
+
   // Route Handlers
   http.get('/api/auth/companies', () =>
     HttpResponse.json(page([{ id: 1, name: 'Acme Lda' }])),
