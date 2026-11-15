@@ -1,10 +1,11 @@
 package org.altechego.leavewise.municipality.service.impl;
 
+import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.altechego.leavewise.common.exception.ConstraintViolations;
 import org.altechego.leavewise.common.web.PageResponse;
-import org.altechego.leavewise.location.repository.CompanyLocationRepository;
 import org.altechego.leavewise.municipality.constants.MunicipalityConstants;
 import org.altechego.leavewise.municipality.dto.MunicipalityRequest;
 import org.altechego.leavewise.municipality.dto.MunicipalityResponse;
@@ -14,6 +15,7 @@ import org.altechego.leavewise.municipality.exception.MunicipalityInUseException
 import org.altechego.leavewise.municipality.exception.MunicipalityNotFoundException;
 import org.altechego.leavewise.municipality.mapper.MunicipalityMapper;
 import org.altechego.leavewise.municipality.repository.MunicipalityRepository;
+import org.altechego.leavewise.municipality.service.MunicipalityReferenceChecker;
 import org.altechego.leavewise.municipality.service.MunicipalityService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +30,7 @@ public class MunicipalityServiceImpl implements MunicipalityService {
 
     private final MunicipalityRepository municipalityRepository;
     private final MunicipalityMapper municipalityMapper;
-    private final CompanyLocationRepository locationRepository;
+    private final List<MunicipalityReferenceChecker> referenceCheckers;
 
 
     @Override
@@ -72,12 +74,11 @@ public class MunicipalityServiceImpl implements MunicipalityService {
         return municipalityMapper.toResponse(updated);
     }
 
-    // BR-15: checked up front; the RESTRICT foreign keys catch a reference added concurrently
     @Override
     @Transactional
     public void delete(Long id) {
         var municipality = getMunicipality(id);
-        if (locationRepository.existsByMunicipalityId(id)) {
+        if (referenceCheckers.stream().anyMatch(checker -> checker.isMunicipalityInUse(id))) {
             throw new MunicipalityInUseException(id);
         }
 

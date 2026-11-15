@@ -2,6 +2,7 @@ package org.altechego.leavewise.auth.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.altechego.leavewise.auth.constants.AuthConstants;
 import org.altechego.leavewise.auth.dto.LoginRequest;
 import org.altechego.leavewise.auth.dto.RefreshTokenRequest;
 import org.altechego.leavewise.auth.dto.TokenPairResponse;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping(AuthConstants.BASE_PATH)
 @RequiredArgsConstructor
 public class AuthController {
 

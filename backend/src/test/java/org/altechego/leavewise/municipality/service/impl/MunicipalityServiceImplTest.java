@@ -14,12 +14,12 @@ import java.util.List;
 import java.util.Optional;
 
 import org.altechego.leavewise.common.exception.ErrorCode;
-import org.altechego.leavewise.location.repository.CompanyLocationRepository;
 import org.altechego.leavewise.municipality.constants.MunicipalityConstants;
 import org.altechego.leavewise.municipality.dto.MunicipalityRequest;
 import org.altechego.leavewise.municipality.entity.Municipality;
 import org.altechego.leavewise.municipality.mapper.MunicipalityMapper;
 import org.altechego.leavewise.municipality.repository.MunicipalityRepository;
+import org.altechego.leavewise.municipality.service.MunicipalityReferenceChecker;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,7 +44,7 @@ class MunicipalityServiceImplTest {
     private MunicipalityRepository municipalityRepository;
 
     @Mock
-    private CompanyLocationRepository locationRepository;
+    private MunicipalityReferenceChecker referenceChecker;
 
     private MunicipalityServiceImpl municipalityService;
 
@@ -52,7 +52,7 @@ class MunicipalityServiceImplTest {
     @BeforeEach
     void setUp() {
         municipalityService = new MunicipalityServiceImpl(
-                municipalityRepository, Mappers.getMapper(MunicipalityMapper.class), locationRepository);
+                municipalityRepository, Mappers.getMapper(MunicipalityMapper.class), List.of(referenceChecker));
     }
 
     @Test
@@ -193,9 +193,9 @@ class MunicipalityServiceImplTest {
 
     // BR-15
     @Test
-    void delete_referencedByLocation_shouldThrowResourceInUseWithoutDeleting() {
+    void delete_referenced_shouldThrowResourceInUseWithoutDeleting() {
         when(municipalityRepository.findById(5L)).thenReturn(Optional.of(municipality(5L, "Braga")));
-        when(locationRepository.existsByMunicipalityId(5L)).thenReturn(true);
+        when(referenceChecker.isMunicipalityInUse(5L)).thenReturn(true);
 
         assertErrorCode(() -> municipalityService.delete(5L), ErrorCode.RESOURCE_IN_USE);
         verify(municipalityRepository, never()).delete(any());
