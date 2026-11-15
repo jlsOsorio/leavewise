@@ -47,6 +47,8 @@ Registration checks, in order: unknown `companyId` → 404 `NOT_FOUND`; location
 
 Companies: `q` = case-insensitive contains on name; sort `name` only. The list is ADMIN only; a USER may GET only their own company by id (another id → 404). Names are unique (`DUPLICATE`). Deleting a company with users → `RESOURCE_IN_USE` (BR-15); its locations, schedule and policies are deleted with it.
 
+Locations: list (POST creates under the company; `Location` points to `/locations/{id}`) sorts by `name` only. Response `{id,companyId,name,address,municipality:{id,name,district,country}}`. The company can't be changed. Unknown company or municipality → 404 `NOT_FOUND`; name unique within the company (`DUPLICATE`); deleting a location with users → `RESOURCE_IN_USE` (BR-15).
+
 Municipalities: `q` = case-insensitive contains on name; sort `name` (default), `district`, `country`. Name + district + country are unique ignoring case (`DUPLICATE`); deleting one still used by a location or holiday → `RESOURCE_IN_USE` (BR-15).
 
 ## Vacations

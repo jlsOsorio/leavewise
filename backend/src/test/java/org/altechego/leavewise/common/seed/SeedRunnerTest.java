@@ -40,7 +40,7 @@ class SeedRunnerTest {
         when(municipalityService.findOrCreate("Lisboa", "Lisboa", "Portugal"))
                 .thenReturn(new MunicipalityResponse(7L, "Lisboa", "Lisboa", "Portugal"));
         when(companyService.findOrCreate("LeaveWise")).thenReturn(new CompanyResponse(3L, "LeaveWise"));
-        when(locationService.findOrCreate(3L, 7L, "Sede")).thenReturn(new LocationResponse(11L, 3L, 7L, "Sede", null));
+        when(locationService.findOrCreate(3L, 7L, "Sede")).thenReturn(new LocationResponse(11L, 3L, "Sede", null, null));
 
         runner.run(null);
 
