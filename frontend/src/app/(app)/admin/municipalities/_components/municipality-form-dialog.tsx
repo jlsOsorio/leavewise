@@ -6,7 +6,7 @@ import { type ReactElement, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-import { FormTextField } from '@/components/forms/FormTextField';
+import { FormTextField } from '@/components/forms/form-text-field';
 import { showActionError } from '@/components/forms/show-action-error';
 import { Button } from '@/components/ui/button';
 import {

@@ -2,11 +2,11 @@
 
 import { Pencil, Trash2 } from 'lucide-react';
 
-import { ConfirmDialog } from '@/components/forms/ConfirmDialog';
+import { ConfirmDialog } from '@/components/forms/confirm-dialog';
 import { Button } from '@/components/ui/button';
 import type { Municipality } from '@/lib/api/municipalities';
 import { deleteMunicipality } from '../actions';
-import { MunicipalityFormDialog } from './MunicipalityFormDialog';
+import { MunicipalityFormDialog } from './municipality-form-dialog';
 
 export function MunicipalityRowActions({
   municipality,

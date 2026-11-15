@@ -7,8 +7,8 @@ import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-import { FormTextField } from '@/components/forms/FormTextField';
-import { RequiredMark } from '@/components/forms/RequiredMark';
+import { FormTextField } from '@/components/forms/form-text-field';
+import { RequiredMark } from '@/components/forms/required-mark';
 import { showActionError } from '@/components/forms/show-action-error';
 import { Button } from '@/components/ui/button';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
@@ -16,12 +16,12 @@ import type { ActionResult } from '@/lib/api/action-result';
 import { errorMessage } from '@/lib/api/errors';
 import { register } from '@/lib/auth/actions';
 import { type RegistrationInput, registrationSchema } from '@/lib/schemas/auth';
-import { type Company, CompanyCombobox } from './CompanyCombobox';
+import { type Company, CompanyCombobox } from './company-combobox';
 import {
   type CompanyLocation,
   loadLocations,
   LocationSelect,
-} from './LocationSelect';
+} from './location-select';
 
 const FIELDS = [
   'name',

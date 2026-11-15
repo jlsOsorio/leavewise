@@ -5,7 +5,7 @@ import { describe, expect, test, vi } from 'vitest';
 
 import { page } from '@/test/msw/handlers';
 import { server } from '@/test/msw/server';
-import { loadLocations, LocationSelect } from './LocationSelect';
+import { loadLocations, LocationSelect } from './location-select';
 
 const LOCATIONS_PATH = '/api/auth/companies/:id/locations';
 

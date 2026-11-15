@@ -6,7 +6,7 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { Button } from '@/components/ui/button';
 import { Toaster } from '@/components/ui/sonner';
 import type { ActionResult } from '@/lib/api/action-result';
-import { ConfirmDialog } from './ConfirmDialog';
+import { ConfirmDialog } from './confirm-dialog';
 
 afterEach(() => {
   toast.dismiss();

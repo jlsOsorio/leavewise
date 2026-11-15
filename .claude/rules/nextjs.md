@@ -54,7 +54,7 @@ Always applies to frontend code. Version gotchas (async `cookies()`/`params`, `p
 - Every `(app)` and `(auth)` route segment has a `loading.tsx` rendering its page skeleton (Next.js wraps `page` in Suspense)
 - Independent slow sections (e.g. the calendar balance card) get their own `<Suspense fallback={<XSkeleton />}>` so the rest streams
 - `loading.tsx` doesn't cover its own `layout.tsx`, and runtime data in a layout (`cookies()`, uncached fetch) blocks navigation: wrap the `(app)` header's user/company fetch in its own `<Suspense>` with a header skeleton
-- Skeletons live next to what they mimic (`_components/XSkeleton.tsx`); shared ones (table, card) in `src/components/layout/`
+- Skeletons live next to what they mimic (`_components/x-skeleton.tsx`); shared ones (table, card) in `src/components/layout/`
 - Client-side waits use skeletons too (combobox results, preview dialog); pending submits use `useActionState`/`useFormStatus` for the disabled button + `Loader2`
 
 ## Data flow
@@ -63,3 +63,4 @@ Always applies to frontend code. Version gotchas (async `cookies()`/`params`, `p
 - Mutations in Server Actions: Zod parse → backend → `revalidatePath` → return `{ok: true} | {ok: false, error: {code, message, fieldErrors?}}`
 - Forms: shadcn `Field` + react-hook-form `Controller` + `zodResolver`; the same schema (`src/lib/schemas/`) runs in the Server Action. Results are built with `src/lib/api/action-result.ts` (`apiFailure`, `validationFailure`); the form maps `fieldErrors` with `setError` and shows other errors as a form-level `root.server` error
 - Route-specific components live in the route's `_components/`; shared ones in `src/components/`
+- File names are kebab-case (`company-combobox.tsx`, `company-combobox.test.tsx`), like shadcn's `ui/`; the exported component stays PascalCase

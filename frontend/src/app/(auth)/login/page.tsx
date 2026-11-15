@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { errorMessage } from '@/lib/api/errors';
-import { LoginForm } from './_components/LoginForm';
+import { LoginForm } from './_components/login-form';
 
 export const metadata: Metadata = { title: 'Sign in' };
 

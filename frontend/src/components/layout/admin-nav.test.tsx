@@ -6,7 +6,7 @@ import { describe, expect, test, vi } from 'vitest';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { server } from '@/test/msw/server';
-import { AdminNav } from './AdminNav';
+import { AdminNav } from './admin-nav';
 
 vi.mock('next/headers', () => ({
   cookies: async () => ({

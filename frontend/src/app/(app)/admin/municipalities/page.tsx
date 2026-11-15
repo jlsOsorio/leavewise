@@ -1,17 +1,17 @@
 import { Plus } from 'lucide-react';
 import type { Metadata } from 'next';
 
-import { type Column, DataTable } from '@/components/layout/DataTable';
-import { PageHeader } from '@/components/layout/PageHeader';
+import { type Column, DataTable } from '@/components/layout/data-table';
+import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
 import type { Municipality } from '@/lib/api/municipalities';
 import type { Page } from '@/lib/api/page';
 import { serverApi } from '@/lib/api/server';
 import { MUNICIPALITY_NAME_MAX_LENGTH } from '@/lib/schemas/municipality';
 import { pageParam, textParam } from '@/lib/search-params';
-import { MunicipalityFormDialog } from './_components/MunicipalityFormDialog';
-import { MunicipalityRowActions } from './_components/MunicipalityRowActions';
-import { MunicipalitySearch } from './_components/MunicipalitySearch';
+import { MunicipalityFormDialog } from './_components/municipality-form-dialog';
+import { MunicipalityRowActions } from './_components/municipality-row-actions';
+import { MunicipalitySearch } from './_components/municipality-search';
 
 export const metadata: Metadata = { title: 'Municipalities' };
 

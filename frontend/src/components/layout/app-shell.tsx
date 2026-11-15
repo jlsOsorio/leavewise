@@ -11,12 +11,12 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { AdminNav } from './AdminNav';
-import { AdminNavBoundary } from './AdminNavBoundary';
-import { HeaderUser } from './HeaderUser';
-import { HeaderUserBoundary } from './HeaderUserBoundary';
-import { HeaderUserSkeleton } from './HeaderUserSkeleton';
-import { NavGroup } from './NavGroup';
+import { AdminNav } from './admin-nav';
+import { AdminNavBoundary } from './admin-nav-boundary';
+import { HeaderUser } from './header-user';
+import { HeaderUserBoundary } from './header-user-boundary';
+import { HeaderUserSkeleton } from './header-user-skeleton';
+import { NavGroup } from './nav-group';
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
