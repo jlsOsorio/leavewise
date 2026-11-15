@@ -1,5 +1,5 @@
 import { getMe } from '@/lib/api/me';
-import { UserMenu } from './UserMenu';
+import { UserMenu } from './user-menu';
 
 export async function HeaderUser() {
   const me = await getMe();

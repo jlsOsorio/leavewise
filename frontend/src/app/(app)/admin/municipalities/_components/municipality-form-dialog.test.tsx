@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { Button } from '@/components/ui/button';
-import { MunicipalityFormDialog } from './MunicipalityFormDialog';
+import { MunicipalityFormDialog } from './municipality-form-dialog';
 
 const actions = vi.hoisted(() => ({
   createMunicipality: vi.fn(),

@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { expect, test, vi } from 'vitest';
 
-import { HeaderUser } from './HeaderUser';
+import { HeaderUser } from './header-user';
 
 vi.mock('next/headers', () => ({
   cookies: async () => ({

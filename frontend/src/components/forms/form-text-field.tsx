@@ -15,7 +15,7 @@ import {
   FieldLabel,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { RequiredMark } from './RequiredMark';
+import { RequiredMark } from './required-mark';
 
 type FormTextFieldProps<TValues extends FieldValues> = {
   control: Control<TValues>;

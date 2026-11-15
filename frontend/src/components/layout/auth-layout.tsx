@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import { YearStrip, YearStripLegend } from '@/components/layout/YearStrip';
+import { YearStrip, YearStripLegend } from '@/components/layout/year-strip';
 
 const HOLIDAYS_2027 = [
   '2027-01-01',

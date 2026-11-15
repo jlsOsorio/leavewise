@@ -1,5 +1,5 @@
 import { getMe } from '@/lib/api/me';
-import { NavGroup } from './NavGroup';
+import { NavGroup } from './nav-group';
 
 export async function AdminNav() {
   const me = await getMe();

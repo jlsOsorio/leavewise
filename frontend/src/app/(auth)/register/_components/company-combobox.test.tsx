@@ -5,7 +5,7 @@ import { describe, expect, test, vi } from 'vitest';
 
 import { page } from '@/test/msw/handlers';
 import { server } from '@/test/msw/server';
-import { CompanyCombobox } from './CompanyCombobox';
+import { CompanyCombobox } from './company-combobox';
 
 const COMPANIES_PATH = '/api/auth/companies';
 

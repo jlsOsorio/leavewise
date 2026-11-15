@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { UserMenu } from './UserMenu';
+import { UserMenu } from './user-menu';
 
 const logout = vi.hoisted(() => vi.fn());
 vi.mock('@/lib/auth/actions', () => ({ logout }));

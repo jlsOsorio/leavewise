@@ -1,4 +1,4 @@
-import { TableSkeleton } from '@/components/layout/TableSkeleton';
+import { TableSkeleton } from '@/components/layout/table-skeleton';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export function MunicipalitiesPageSkeleton() {

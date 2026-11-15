@@ -5,7 +5,7 @@ import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 
-import { FormTextField } from '@/components/forms/FormTextField';
+import { FormTextField } from '@/components/forms/form-text-field';
 import { showActionError } from '@/components/forms/show-action-error';
 import { Button } from '@/components/ui/button';
 import { FieldError } from '@/components/ui/field';

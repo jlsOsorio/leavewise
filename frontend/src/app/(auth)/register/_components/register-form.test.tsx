@@ -7,7 +7,7 @@ import { beforeEach, expect, test, vi } from 'vitest';
 import { Toaster } from '@/components/ui/sonner';
 import { page } from '@/test/msw/handlers';
 import { server } from '@/test/msw/server';
-import { RegisterForm } from './RegisterForm';
+import { RegisterForm } from './register-form';
 
 const router = vi.hoisted(() => ({ replace: vi.fn() }));
 vi.mock('next/navigation', () => ({ useRouter: () => router }));
