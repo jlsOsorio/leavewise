@@ -110,7 +110,7 @@ function LocationOptions({
       >
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent position="popper">
         {options.map((location) => (
           <SelectItem key={location.id} value={String(location.id)}>
             {location.name}
