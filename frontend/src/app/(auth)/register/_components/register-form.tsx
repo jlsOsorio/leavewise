@@ -13,10 +13,11 @@ import { showActionError } from '@/components/forms/show-action-error';
 import { Button } from '@/components/ui/button';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import type { ActionResult } from '@/lib/api/action-result';
+import type { Company } from '@/lib/api/companies';
 import { errorMessage } from '@/lib/api/errors';
 import { register } from '@/lib/auth/actions';
 import { type RegistrationInput, registrationSchema } from '@/lib/schemas/auth';
-import { type Company, CompanyCombobox } from './company-combobox';
+import { CompanyCombobox } from './company-combobox';
 import {
   type CompanyLocation,
   loadLocations,

@@ -5,14 +5,16 @@ import { describe, expect, test, vi } from 'vitest';
 
 import { page } from '@/test/msw/handlers';
 import { server } from '@/test/msw/server';
-import { CompanyCombobox } from './company-combobox';
+import { AsyncCombobox } from './async-combobox';
 
-const COMPANIES_PATH = '/api/auth/companies';
+const SEARCH_PATH = '/api/test/items';
 
-function companiesByQuery(results: Record<string, string[]>, slow = '') {
+type Item = { id: number; name: string };
+
+function itemsByQuery(results: Record<string, string[]>, slow = '') {
   const queries: string[] = [];
   server.use(
-    http.get(COMPANIES_PATH, async ({ request }) => {
+    http.get(SEARCH_PATH, async ({ request }) => {
       const q = new URL(request.url).searchParams.get('q') ?? '';
       queries.push(q);
       if (q === slow) {
@@ -27,40 +29,69 @@ function companiesByQuery(results: Record<string, string[]>, slow = '') {
   return queries;
 }
 
-function renderCombobox(onChange = vi.fn()) {
+function itemName(item: Item): string {
+  return item.name;
+}
+
+function renderCombobox({
+  onChange = vi.fn(),
+  defaultValue,
+}: { onChange?: (item: Item) => void; defaultValue?: Item } = {}) {
   render(
     <>
-      <label htmlFor="company">Company</label>
-      <CompanyCombobox id="company" onChange={onChange} invalid={false} />
+      <label htmlFor="item">Item</label>
+      <AsyncCombobox
+        id="item"
+        searchPath={SEARCH_PATH}
+        optionLabel={itemName}
+        texts={{
+          placeholder: 'Pick an item',
+          searchPlaceholder: 'Type an item name',
+          searching: 'Searching items…',
+          empty: 'No item matches that name.',
+          failed: 'Items could not be loaded.',
+        }}
+        defaultValue={defaultValue}
+        onChange={onChange}
+        invalid={false}
+      />
     </>,
   );
   return { user: userEvent.setup(), onChange };
 }
 
 const openCombobox = (user: UserEvent) =>
-  user.click(screen.getByRole('combobox', { name: 'Company' }));
+  user.click(screen.getByRole('combobox', { name: 'Item' }));
 
-describe('CompanyCombobox', () => {
-  test('lists companies on open and reports the chosen one', async () => {
-    companiesByQuery({ '': ['Acme Lda', 'Beta SA'] });
+describe('AsyncCombobox', () => {
+  test('lists options on open and reports the chosen one', async () => {
+    itemsByQuery({ '': ['Acme Lda', 'Beta SA'] });
     const { user, onChange } = renderCombobox();
 
     await openCombobox(user);
     await user.click(await screen.findByRole('option', { name: 'Beta SA' }));
 
     expect(onChange).toHaveBeenCalledWith({ id: 2, name: 'Beta SA' });
-    expect(screen.getByRole('combobox', { name: 'Company' })).toHaveTextContent(
+    expect(screen.getByRole('combobox', { name: 'Item' })).toHaveTextContent(
       'Beta SA',
     );
   });
 
+  test('shows the default value before anything is chosen', () => {
+    renderCombobox({ defaultValue: { id: 7, name: 'Braga' } });
+
+    expect(screen.getByRole('combobox', { name: 'Item' })).toHaveTextContent(
+      'Braga',
+    );
+  });
+
   test('searches once typing pauses, not on every keystroke', async () => {
-    const queries = companiesByQuery({ '': ['Acme Lda'], acme: ['Acme Lda'] });
+    const queries = itemsByQuery({ '': ['Acme Lda'], acme: ['Acme Lda'] });
     const { user } = renderCombobox();
 
     await openCombobox(user);
     await screen.findByRole('option', { name: 'Acme Lda' });
-    await user.type(screen.getByPlaceholderText('Type a company name'), 'acme');
+    await user.type(screen.getByPlaceholderText('Type an item name'), 'acme');
     await vi.waitFor(() => expect(queries).toHaveLength(2));
     await delay(400);
 
@@ -68,10 +99,10 @@ describe('CompanyCombobox', () => {
   });
 
   test('shows the latest search even when an older one answers later', async () => {
-    companiesByQuery({ '': [], ol: ['Old Co'], old: ['New Co'] }, 'ol');
+    itemsByQuery({ '': [], ol: ['Old Co'], old: ['New Co'] }, 'ol');
     const { user } = renderCombobox();
     await openCombobox(user);
-    const input = screen.getByPlaceholderText('Type a company name');
+    const input = screen.getByPlaceholderText('Type an item name');
 
     await user.type(input, 'ol');
     await delay(350); // the "ol" search is now in flight
@@ -84,9 +115,9 @@ describe('CompanyCombobox', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('tells how many companies match when only the first page is listed', async () => {
+  test('tells how many options match when only the first page is listed', async () => {
     server.use(
-      http.get(COMPANIES_PATH, () =>
+      http.get(SEARCH_PATH, () =>
         HttpResponse.json(page([{ id: 1, name: 'Acme Lda' }], 500)),
       ),
     );
@@ -99,27 +130,25 @@ describe('CompanyCombobox', () => {
     ).toBeVisible();
   });
 
-  test('says so when no company matches', async () => {
-    companiesByQuery({ '': [] });
+  test('says so when no option matches', async () => {
+    itemsByQuery({ '': [] });
     const { user } = renderCombobox();
 
     await openCombobox(user);
 
-    expect(
-      await screen.findByText('No company matches that name.'),
-    ).toBeVisible();
+    expect(await screen.findByText('No item matches that name.')).toBeVisible();
   });
 
   test('says so when the search fails', async () => {
     server.use(
-      http.get(COMPANIES_PATH, () => new HttpResponse(null, { status: 500 })),
+      http.get(SEARCH_PATH, () => new HttpResponse(null, { status: 500 })),
     );
     const { user } = renderCombobox();
 
     await openCombobox(user);
 
     expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Companies could not be loaded.',
+      'Items could not be loaded.',
     );
   });
 });
