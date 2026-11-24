@@ -42,6 +42,11 @@ const LOCATIONS = [
   { id: 2, name: 'Porto' },
 ];
 
+const MUNICIPALITIES = [
+  { id: 5, name: 'Braga', district: 'Braga', country: 'Portugal' },
+  { id: 6, name: 'Guimarães', district: 'Braga', country: 'Portugal' },
+];
+
 // Default happy-path mocks of the backend
 export const handlers: RequestHandler[] = [
   http.post(backend('/auth/refresh'), () => HttpResponse.json(refreshedPair())),
@@ -106,11 +111,31 @@ export const handlers: RequestHandler[] = [
     () => new HttpResponse(null, { status: 204 }),
   ),
 
+  http.post(backend('/companies/:companyId/locations'), async ({ request }) =>
+    HttpResponse.json(
+      { id: 11, ...((await request.json()) as object) },
+      { status: 201 },
+    ),
+  ),
+  http.put(backend('/locations/:id'), async ({ params, request }) =>
+    HttpResponse.json({
+      id: Number(params.id),
+      ...((await request.json()) as object),
+    }),
+  ),
+  http.delete(
+    backend('/locations/:id'),
+    () => new HttpResponse(null, { status: 204 }),
+  ),
+
   // Route Handlers
   http.get('/api/auth/companies', () =>
     HttpResponse.json(page([{ id: 1, name: 'Acme Lda' }])),
   ),
   http.get('/api/auth/companies/:id/locations', () =>
     HttpResponse.json(page(LOCATIONS)),
+  ),
+  http.get('/api/admin/municipalities', () =>
+    HttpResponse.json(page(MUNICIPALITIES)),
   ),
 ];

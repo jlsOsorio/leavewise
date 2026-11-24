@@ -7,8 +7,8 @@
 ```
 src/app/(auth)/login, (auth)/register
 src/app/(app)/layout.tsx (header), page.tsx (placeholder home until the calendar, M4), calendar (home), vacations, imports, imports/[id], suggestions, profile
-src/app/(app)/admin/{companies, municipalities, users, holidays, policies, entitlements, schedules, approvals}
-src/app/api/auth/companies/route.ts (picker search), api/auth/companies/[id]/locations/route.ts (location select)
+src/app/(app)/admin/{companies, companies/[id] (locations), municipalities, users, holidays, policies, entitlements, schedules, approvals}
+src/app/api/auth/companies/route.ts (picker search), api/auth/companies/[id]/locations/route.ts (location select), api/admin/municipalities/route.ts (location dialog picker)
 src/app/api/imports/route.ts (upload), api/imports/[id]/events/route.ts (SSE proxy), api/imports/template/route.ts
 src/lib/api/{server.ts, errors.ts, media-type.ts, action-result.ts}  src/lib/auth/ (actions.ts: login, registration, logout)  src/lib/schemas/  src/lib/dates.ts
 src/components/{ui (shadcn), calendar, forms, layout}
