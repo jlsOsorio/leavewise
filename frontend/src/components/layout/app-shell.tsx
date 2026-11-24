@@ -17,6 +17,7 @@ import { HeaderUser } from './header-user';
 import { HeaderUserBoundary } from './header-user-boundary';
 import { HeaderUserSkeleton } from './header-user-skeleton';
 import { NavGroup } from './nav-group';
+import { NavGroupSkeleton } from './nav-group-skeleton';
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
@@ -44,7 +45,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           </SidebarHeader>
           <SidebarContent>
             <nav aria-label="Main" className="flex flex-col">
-              <NavGroup section="main" />
+              <Suspense fallback={<NavGroupSkeleton section="main" />}>
+                <NavGroup section="main" />
+              </Suspense>
               <AdminNavBoundary>
                 <Suspense fallback={null}>
                   <AdminNav />

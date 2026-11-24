@@ -1,5 +1,6 @@
 import { Plus } from 'lucide-react';
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
 import { SearchForm } from '@/components/forms/search-form';
 import { type Column, DataTable } from '@/components/layout/data-table';
@@ -18,7 +19,18 @@ export const metadata: Metadata = { title: 'Companies' };
 const PAGE_PATH = '/admin/companies';
 
 const COLUMNS: Column<Company>[] = [
-  { key: 'name', header: 'Name', cell: (row) => row.name },
+  {
+    key: 'name',
+    header: 'Name',
+    cell: (row) => (
+      <Link
+        href={`${PAGE_PATH}/${row.id}`}
+        className="underline-offset-4 hover:underline"
+      >
+        {row.name}
+      </Link>
+    ),
+  },
   {
     key: 'actions',
     header: 'Actions',
