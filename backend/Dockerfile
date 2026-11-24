@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM eclipse-temurin:25-jdk AS build
+FROM eclipse-temurin:25.0.5.1_2-jdk AS build
 WORKDIR /workspace
 COPY mvnw pom.xml ./
 COPY .mvn .mvn
@@ -9,7 +9,7 @@ COPY src src
 RUN --mount=type=cache,target=/root/.m2 ./mvnw -B -DskipTests package \
     && cp target/leavewise-*.jar leavewise.jar
 
-FROM eclipse-temurin:25-jre
+FROM eclipse-temurin:25.0.5.1_2-jre
 # curl for the compose healthcheck; /data/uploads is the STORAGE_PATH volume (owned by the app user)
 RUN apt-get update \
     && apt-get install -y --no-install-recommends curl \
