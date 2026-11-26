@@ -49,6 +49,8 @@ Companies: `q` = case-insensitive contains on name; sort `name` only. The list i
 
 Locations: list (POST creates under the company; `Location` points to `/locations/{id}`) sorts by `name` only. Response `{id,companyId,name,address,municipality:{id,name,district,country}}`. The company can't be changed. Unknown company or municipality → 404 `NOT_FOUND`; name unique within the company (`DUPLICATE`); deleting a location with users → `RESOURCE_IN_USE` (BR-15).
 
+Work schedule: one per company. Response `{id,companyId,name,days:[{dayOfWeek,isWorkingDay}]}` with `days` ordered 1 (Monday) … 7 (Sunday). GET: ADMIN any company, USER only their own (another company → 404); no schedule yet → 404 `NOT_FOUND` (callers fall back to Mon–Fri, BR-5). PUT creates or replaces it and returns 200 either way; `days` must hold exactly 7 entries, each `dayOfWeek` 1..7 once (`VALIDATION_ERROR` on `days`). Unknown company → 404. Deleted with its company.
+
 Municipalities: `q` = case-insensitive contains on name; sort `name` (default), `district`, `country`. Name + district + country are unique ignoring case (`DUPLICATE`); deleting one still used by a location or holiday → `RESOURCE_IN_USE` (BR-15).
 
 ## Vacations
